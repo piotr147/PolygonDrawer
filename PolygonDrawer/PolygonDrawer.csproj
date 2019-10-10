@@ -72,6 +72,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\MouseButtonEventArgsToPointConverter.cs" />
     <Compile Include="Converters\PushBindingStringFormatConverter.cs" />
     <Compile Include="PushBinding\FreezableBinding.cs" />
     <Compile Include="PushBinding\PushBinding.cs" />

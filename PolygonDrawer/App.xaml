@@ -7,7 +7,7 @@
              >
     <Application.Resources>
         <ResourceDictionary>
-            <vm:MainViewModel x:Key="Main" />
+            <vm:MainViewModel x:Key="Main"></vm:MainViewModel>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

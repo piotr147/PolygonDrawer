@@ -7,6 +7,7 @@
         xmlns:pb="clr-namespace:PushBindingExtension"
         xmlns:con="clr-namespace:PushBindingInStyleDemo.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:helpers="clr-namespace:PolygonDrawer.Converters"
         mc:Ignorable="d"
         xmlns:command="http://www.galasoft.ch/mvvmlight"
         Title="MainWindow" 
@@ -16,7 +17,9 @@
         Background="AliceBlue"
         >
     <Window.Resources>
-        <TextBlock x:Key="sourceTextBlock"/>
+        <ResourceDictionary>
+            <helpers:MouseButtonEventArgsToPointConverter x:Key="MouseButtonEventArgsToPointConverter" />
+        </ResourceDictionary>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -24,10 +27,11 @@
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
-        <Image Name="im" Grid.Column="0" Source="{Binding Bitmap}" >
+        <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseDown">
-                    <command:EventToCommand Command="{Binding MouseClickedOnBitmap}" PassEventArgsToCommand="True" />
+                    <command:EventToCommand Command="{Binding MouseClickedOnBitmap}" EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}" 
+                                            PassEventArgsToCommand="True" EventArgsConverterParameter="{Binding ElementName=Im}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Image>

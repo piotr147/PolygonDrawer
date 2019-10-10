@@ -10,6 +10,7 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Configuration;
+using PolygonDrawer.Converters;
 
 namespace PolygonDrawer.ViewModel
 {
@@ -52,7 +53,7 @@ namespace PolygonDrawer.ViewModel
             }
         }
 
-        public RelayCommand<MouseEventArgs> MouseClickedOnBitmap
+        public RelayCommand<Point> MouseClickedOnBitmap
         {
             get;
             private set;
@@ -83,15 +84,15 @@ namespace PolygonDrawer.ViewModel
             DrawPoint(50, 50);
 
 
-            MouseClickedOnBitmap = new RelayCommand<MouseEventArgs>(
+            MouseClickedOnBitmap = new RelayCommand<Point>(
                 Bitmapclick
                 , true);
         }
 
-        
-        private void Bitmapclick(MouseEventArgs e)
+
+        private void Bitmapclick(Point e)
         {
-            DrawPoint(e.GetPosition());
+            DrawPoint(e);
             
         }
 
