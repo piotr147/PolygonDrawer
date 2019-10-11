@@ -31,11 +31,6 @@ namespace PolygonDrawer.Model
 
         public Edge(Vertex v1, Vertex v2)
         {
-            if (v1.X > v2.X)
-            {
-                this.V1 = v2;
-                this.V2 = v1;
-            }
             this.V1 = v1;
             this.V2 = v2;
         }

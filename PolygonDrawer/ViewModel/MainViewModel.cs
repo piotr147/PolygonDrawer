@@ -44,8 +44,13 @@ namespace PolygonDrawer.ViewModel
         private ObservableCollection<Vertex> _vertices;
         private ObservableCollection<Edge> _edges;
         private bool _isFirstVertexOfEdge;
-        private bool _isDrawingOn;
+        private bool _isDrawingModeOn;
         private Vertex _lastVertex;
+        private ObservableCollection<Polygon> _polygons;
+        private ObservableCollection<Vertex> _verticesInProgress;
+        private ObservableCollection<Edge> _edgesInProgress;
+        private Vertex _firstVertexOfPolygonInProgress;
+        private bool _isMovingModeOn;
 
         public WriteableBitmap Bitmap
         {
@@ -65,16 +70,46 @@ namespace PolygonDrawer.ViewModel
             set { _edges = value; RaisePropertyChanged((nameof(Vertices))); }
         }
 
+        public ObservableCollection<Polygon> Polygons
+        {
+            get { return _polygons; }
+            set { _polygons = value; RaisePropertyChanged(nameof(Polygons)); }
+        }
+
+        public ObservableCollection<Vertex> VerticesInProgress
+        {
+            get { return _verticesInProgress; }
+            set { _verticesInProgress = value; RaisePropertyChanged(nameof(VerticesInProgress)); }
+        }
+
+        public ObservableCollection<Edge> EdgesInProgress
+        {
+            get { return _edgesInProgress; }
+            set { _edgesInProgress = value; RaisePropertyChanged(nameof(Edges)); }
+        }
+
+        public Vertex FirstVertexOfPolygonInProgress
+        {
+            get { return _firstVertexOfPolygonInProgress; }
+            set { _firstVertexOfPolygonInProgress = value; RaisePropertyChanged(nameof(FirstVertexOfPolygonInProgress)); }
+        }
+
         public bool IsFirstVertexOfEdge
         {
             get { return _isFirstVertexOfEdge; }
             set { _isFirstVertexOfEdge = value; RaisePropertyChanged(nameof(IsFirstVertexOfEdge)); }
         }
 
-        public bool IsDrawingOn
+        public bool IsDrawingModeOn
         {
-            get { return _isDrawingOn; }
-            set { _isDrawingOn = value; RaisePropertyChanged(nameof(IsDrawingOn)); }
+            get { return _isDrawingModeOn; }
+            set { _isDrawingModeOn = value; RaisePropertyChanged(nameof(IsDrawingModeOn)); }
+        }
+
+        public bool IsMovingModeOn
+        {
+            get { return _isMovingModeOn; }
+            set { _isMovingModeOn = value; RaisePropertyChanged(nameof(IsMovingModeOn)); }
         }
 
         public Vertex LastVertex
@@ -97,9 +132,12 @@ namespace PolygonDrawer.ViewModel
             Height = Convert.ToInt32(ConfigurationSettings.AppSettings["bitmapHeight"]);
             Bitmap = new WriteableBitmap(Width, Height, 96, 96, PixelFormats.Bgr32, null);
             IsFirstVertexOfEdge = true;
-            IsDrawingOn = true;
+            IsDrawingModeOn = true;
             Vertices = new ObservableCollection<Vertex>();
             Edges = new ObservableCollection<Edge>();
+            Polygons = new ObservableCollection<Polygon>();
+            VerticesInProgress = new ObservableCollection<Vertex>();
+            EdgesInProgress = new ObservableCollection<Edge>();
 
             {
                 //byte blue = 255;
@@ -120,16 +158,6 @@ namespace PolygonDrawer.ViewModel
                 //DrawPoint(100, 50);
             }
 
-            //Drawer.Bresenham(Bitmap, 100, 50, 200, 25);
-            //Drawer.Bresenham(Bitmap, 100, 50, 200, 75);
-            //Drawer.Bresenham(Bitmap, 500, 350, 700, 225);
-            //Drawer.Bresenham(Bitmap, 100, 50, 200, 25);
-
-            var v1 = new Vertex(200, 150);
-            var v2 = new Vertex(300, 200);
-            var e1 = new Edge(v1, v2);
-
-            Drawer.DrawEdge(Bitmap, e1);
 
             MouseClickedOnBitmap = new RelayCommand<Point>(Bitmapclick, true);
         }
@@ -139,40 +167,62 @@ namespace PolygonDrawer.ViewModel
         {
             int x = (int)p.X;
             int y = (int)p.Y;
-            if (IsDrawingOn)
+            if (IsDrawingModeOn)
             {
-                if (!CheckIfOnExistingVertex(x, y))
+                if (FirstVertexOfPolygonInProgress != null 
+                    && x >= FirstVertexOfPolygonInProgress.X - 4 && x <= FirstVertexOfPolygonInProgress.X + 4 
+                    && y >= FirstVertexOfPolygonInProgress.Y - 4 && y <= FirstVertexOfPolygonInProgress.Y + 4)
+                {
+                    FinishPolygonInProgress();
+                }
+                else if (!CheckIfOnExistingVertex(x, y))
                 {
                     
                     var v = new Vertex(x, y);
                     Vertices.Add(v);
+                    VerticesInProgress.Add(v);
                     Drawer.DrawVertex(Bitmap, v);
-
-                    if (!IsFirstVertexOfEdge)
+                    if (FirstVertexOfPolygonInProgress != null)
                     {
+                        
+                    
                         var e = new Edge(LastVertex, v);
                         Edges.Add(e);
+                        EdgesInProgress.Add(e);
                         Drawer.DrawEdge(Bitmap, e);
                     }
                     else
                     {
                         IsFirstVertexOfEdge = false;
+                        FirstVertexOfPolygonInProgress = v;
                     }
 
                     LastVertex = v;
                 }
-
-
-
             }
         }
 
+        private void FinishPolygonInProgress()
+        {
+            if (VerticesInProgress.Count < 3)
+                return;
+            var e = new Edge(LastVertex, FirstVertexOfPolygonInProgress);
+            Drawer.DrawEdge(Bitmap, e);
+            EdgesInProgress.Add(e);
+            Edges.Add(e);
+
+            var poly = new Polygon(VerticesInProgress, EdgesInProgress);
+            Polygons.Add(poly);
+            FirstVertexOfPolygonInProgress = null;
+            VerticesInProgress = new ObservableCollection<Vertex>();
+            EdgesInProgress = new ObservableCollection<Edge>();
+        }
 
         private bool CheckIfOnExistingVertex(int x, int y)
         {
             foreach (var v in Vertices)
             {
-                if ((x >= v.X - 1 && x <= v.X + 1) || (y >= v.Y - 1 && y <= v.Y + 1))
+                if (x >= v.X - 2 && x <= v.X + 2 && y >= v.Y - 2 && y <= v.Y + 2)
                     return true;
             }
 

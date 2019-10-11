@@ -213,9 +213,9 @@ namespace PolygonDrawer.ViewModel
 
         public static void DrawVertex(WriteableBitmap bitmap, Vertex v)
         {
-            for (int i = -1; i <= 1; i++)
+            for (int i = -2; i <= 2; i++)
             {
-                for (int j = -1; j <= 1; j++)
+                for (int j = -2; j <= 2; j++)
                 {
                     DrawPixel(bitmap, v.X + i, v.Y +j);
                 }
@@ -224,9 +224,9 @@ namespace PolygonDrawer.ViewModel
 
         public static void EraseVertex(WriteableBitmap bitmap, Vertex v)
         {
-            for (int i = -1; i <= 1; i++)
+            for (int i = -2; i <= 2; i++)
             {
-                for (int j = -1; j <= 1; j++)
+                for (int j = -2; j <= 2; j++)
                 {
                     DrawPixel(bitmap, v.X + i, v.Y + j, 0, 0, 0);
                 }
