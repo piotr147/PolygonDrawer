@@ -81,7 +81,15 @@ namespace PolygonDrawer.ViewModel
                 
             }
 
-            DrawPoint(50, 50);
+            //DrawPoint(100, 50);
+
+
+            Drawer.Bresenham(Bitmap, 100, 50, 200, 25);
+            Drawer.Bresenham(Bitmap, 100, 50, 200, 75);
+
+            Drawer.Bresenham(Bitmap, 500, 350, 700, 225);
+            Drawer.Bresenham(Bitmap, 100, 50, 200, 25);
+
 
 
             MouseClickedOnBitmap = new RelayCommand<Point>(
