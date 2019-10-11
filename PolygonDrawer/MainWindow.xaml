@@ -26,19 +26,20 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
-        
-        <Canvas>
-            <Border BorderThickness="2" BorderBrush="Black">
-                <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDown">
-                            <command:EventToCommand Command="{Binding MouseClickedOnBitmap}" EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}" 
-                                                PassEventArgsToCommand="True" EventArgsConverterParameter="{Binding ElementName=Im}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Image>
-            </Border>
-        </Canvas>
-        
+
+        <ScrollViewer>
+            <Canvas>
+                <Border BorderThickness="2" BorderBrush="Black">
+                    <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseDown">
+                                <command:EventToCommand Command="{Binding MouseClickedOnBitmap}" EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}" 
+                                                    PassEventArgsToCommand="True" EventArgsConverterParameter="{Binding ElementName=Im}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Image>
+                </Border>
+            </Canvas>
+        </ScrollViewer>
     </Grid>
 </Window>

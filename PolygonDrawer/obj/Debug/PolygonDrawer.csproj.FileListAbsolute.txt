@@ -55,3 +55,4 @@ C:\Projects\MyProjects\PolygonDrawer\PolygonDrawer\obj\Debug\PolygonDrawer.Prope
 C:\Projects\MyProjects\PolygonDrawer\PolygonDrawer\obj\Debug\PolygonDrawer.csproj.GenerateResource.cache
 C:\Projects\MyProjects\PolygonDrawer\PolygonDrawer\obj\Debug\PolygonDrawer.csproj.CoreCompileInputs.cache
 C:\Projects\MyProjects\PolygonDrawer\PolygonDrawer\obj\Debug\PolygonDrawer.csproj.CopyComplete
+C:\Projects\MyProjects\PolygonDrawer\PolygonDrawer\obj\Debug\PolygonDrawer.csprojAssemblyReference.cache

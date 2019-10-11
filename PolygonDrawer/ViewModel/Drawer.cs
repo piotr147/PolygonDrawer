@@ -10,7 +10,10 @@ using System.Windows.Input;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Configuration;
+using System.Security.Cryptography.X509Certificates;
+using System.Windows.Media.Animation;
 using PolygonDrawer.Converters;
+using PolygonDrawer.Model;
 
 
 namespace PolygonDrawer.ViewModel
@@ -19,7 +22,7 @@ namespace PolygonDrawer.ViewModel
     {
 
 
-        public static void Bresenham(WriteableBitmap bitmap, int x1, int y1, int x2, int y2)
+        public static void Bresenham(WriteableBitmap bitmap, int x1, int y1, int x2, int y2, int r = 255, int g = 0, int b = 0)
         {
             int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
 
@@ -124,7 +127,7 @@ namespace PolygonDrawer.ViewModel
                 }
             }
 
-
+            
 
             ////if (!(x1 < x2 && y1 > y2))
             //if (!(x1 < x2))
@@ -185,18 +188,49 @@ namespace PolygonDrawer.ViewModel
 
         }
 
-
-        public static void DrawPixel(WriteableBitmap bitmap, int x, int y)
+        public static void EraseEdge(WriteableBitmap bitmap, Edge e)
         {
-            byte blue = 0;
-            byte green = 0;
-            byte red = 255;
+            Bresenham(bitmap,e.V1.X, e.V1.Y, e.V2.X, e.V2.Y, 0, 0, 0);
+        }
+
+        public static void DrawEdge(WriteableBitmap bitmap, Edge e)
+        {
+            Bresenham(bitmap, e.V1.X, e.V1.Y, e.V2.X, e.V2.Y);
+        }
+        public static void DrawPixel(WriteableBitmap bitmap, int x, int y, int r = 255, int g = 0, int b = 0)
+        {
+            byte blue = (byte)b;
+            byte green = (byte)g;
+            byte red = (byte)r;
             byte alpha = 255;
+
             byte[] colorData = { blue, green, red, alpha };
 
             Int32Rect rect = new Int32Rect(x, y, 1, 1);
             bitmap.WritePixels(rect, colorData, 4, 0);
 
+        }
+
+        public static void DrawVertex(WriteableBitmap bitmap, Vertex v)
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    DrawPixel(bitmap, v.X + i, v.Y +j);
+                }
+            }
+        }
+
+        public static void EraseVertex(WriteableBitmap bitmap, Vertex v)
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                for (int j = -1; j <= 1; j++)
+                {
+                    DrawPixel(bitmap, v.X + i, v.Y + j, 0, 0, 0);
+                }
+            }
         }
 
     }
