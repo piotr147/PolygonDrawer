@@ -26,7 +26,7 @@
             <ColumnDefinition Width="300" />
         </Grid.ColumnDefinitions>
 
-        <ScrollViewer>
+        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
             <Canvas>
                 <Border BorderThickness="2" BorderBrush="Black">
                     <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >

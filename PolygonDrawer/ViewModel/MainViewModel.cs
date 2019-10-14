@@ -226,6 +226,9 @@ namespace PolygonDrawer.ViewModel
 
             if (IsVertexMoving)
             {
+                if (x < 4 || x > Width - 4 || y < 4 || y > Height - 4)
+                    return;
+
                 CapturedVertex.X = x;
                 CapturedVertex.Y = y;
 
@@ -235,6 +238,15 @@ namespace PolygonDrawer.ViewModel
             {
                 var v1 = CapturedEdge.V1;
                 var v2 = CapturedEdge.V2;
+
+                if (v1.X + x - CapturedPointOfEdge.X < 4 || v1.X + x - CapturedPointOfEdge.X > Width - 4
+                                                         || v1.Y + y - CapturedPointOfEdge.Y < 4 ||
+                                                         v1.Y + y - CapturedPointOfEdge.Y > Height - 4
+                                                         || v2.X + x - CapturedPointOfEdge.X < 4 ||
+                                                         v2.X + x - CapturedPointOfEdge.X > Width - 4
+                                                         || v2.Y + y - CapturedPointOfEdge.Y < 4 ||
+                                                         v2.Y + y - CapturedPointOfEdge.Y > Height - 4)
+                    return;
 
                 v1.X = v1.X + x - CapturedPointOfEdge.X;
                 v1.Y = v1.Y + y - CapturedPointOfEdge.Y;
@@ -292,7 +304,7 @@ namespace PolygonDrawer.ViewModel
                     LastVertex = v;
                 }
             }
-            else if (IsMovingModeOn)
+            else if (IsMovingModeOn)                            // Moving mode
             {
                 var e = CheckIfOnExistingEdge(x, y);
                 if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving )
@@ -300,7 +312,7 @@ namespace PolygonDrawer.ViewModel
                     IsVertexMoving = true;
                     CapturedVertex = FindCapturedVertex(x, y);
                 }
-                else if (e != null && !IsEdgeMoving)
+                else if (e != null && !IsEdgeMoving && !IsVertexMoving)
                 {
                     CapturedEdge = e;
                     IsEdgeMoving = true;
@@ -435,6 +447,13 @@ namespace PolygonDrawer.ViewModel
             }
 
             return null;
+        }
+
+        private bool IsVertexInsideBitmap()
+        {
+
+
+            return true;
         }
 
         public void RefreshBitmap()
