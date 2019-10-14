@@ -73,14 +73,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\MouseButtonEventArgsToPointConverter.cs" />
-    <Compile Include="Converters\PushBindingStringFormatConverter.cs" />
+    <Compile Include="Converters\MouseData.cs" />
+    <Compile Include="Converters\MouseEventArgsConverter.cs" />
+    <Compile Include="Model\TypeOfRelation.cs" />
     <Compile Include="Model\Edge.cs" />
     <Compile Include="Model\Polygon.cs" />
     <Compile Include="Model\Vertex.cs" />
-    <Compile Include="PushBinding\FreezableBinding.cs" />
-    <Compile Include="PushBinding\PushBinding.cs" />
-    <Compile Include="PushBinding\PushBindingCollection.cs" />
-    <Compile Include="PushBinding\PushBindingManager.cs" />
     <Compile Include="ViewModel\Drawer.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">

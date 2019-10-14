@@ -4,8 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PolygonDrawer"
-        xmlns:pb="clr-namespace:PushBindingExtension"
-        xmlns:con="clr-namespace:PushBindingInStyleDemo.Converters"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:helpers="clr-namespace:PolygonDrawer.Converters"
         mc:Ignorable="d"
@@ -19,6 +17,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <helpers:MouseButtonEventArgsToPointConverter x:Key="MouseButtonEventArgsToPointConverter" />
+            <helpers:MouseEventArgsConverter x:Key="MouseEventArgsConverter"></helpers:MouseEventArgsConverter>
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
@@ -32,8 +31,12 @@
                 <Border BorderThickness="2" BorderBrush="Black">
                     <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="MouseDown">
-                                <command:EventToCommand Command="{Binding MouseClickedOnBitmap}" EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}" 
+                            <i:EventTrigger EventName="MouseUp">
+                                <command:EventToCommand Command="{Binding MouseUpOnBitmap}" EventArgsConverter="{StaticResource MouseButtonEventArgsToPointConverter}" 
+                                                    PassEventArgsToCommand="True" EventArgsConverterParameter="{Binding ElementName=Im}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseMove">
+                                <command:EventToCommand Command="{Binding MouseMoveOnBitmap}" EventArgsConverter="{StaticResource MouseEventArgsConverter}" 
                                                     PassEventArgsToCommand="True" EventArgsConverterParameter="{Binding ElementName=Im}"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
@@ -41,5 +44,16 @@
                 </Border>
             </Canvas>
         </ScrollViewer>
+
+        <StackPanel Grid.Column="1">
+            <Button Content="Mode" Command="{Binding ChangeMode}">
+            </Button>
+            <Button Content ="Delete Vertex" Command="{Binding DeleteVertex}">
+            </Button>
+            <TextBlock Text="{Binding DeleteVertexNextMove}">
+            </TextBlock>
+            <Button Content="Add Vertex"></Button>
+        </StackPanel>
+
     </Grid>
 </Window>
