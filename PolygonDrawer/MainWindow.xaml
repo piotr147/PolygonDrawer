@@ -46,13 +46,22 @@
         </ScrollViewer>
 
         <StackPanel Grid.Column="1">
-            <Button Content="Mode" Command="{Binding ChangeMode}">
+            <Button Content="Drawing Mode ?" Command="{Binding ChangeMode}">
             </Button>
+            <TextBlock Text="{Binding IsDrawingModeOn}">
+            </TextBlock>
             <Button Content ="Delete Vertex" Command="{Binding DeleteVertex}">
             </Button>
             <TextBlock Text="{Binding DeleteVertexNextMove}">
             </TextBlock>
-            <Button Content="Add Vertex"></Button>
+            <Button Content="Add Vertex" Command="{Binding AddVertex}">
+            </Button>
+            <TextBlock Text="{Binding AddVertexNextMove}">
+            </TextBlock>
+            <Button Content="Move Polygon" Command="{Binding MovePolygon}">
+            </Button>
+            <TextBlock Text="{Binding PolygonMovingMode}">
+            </TextBlock>
         </StackPanel>
 
     </Grid>

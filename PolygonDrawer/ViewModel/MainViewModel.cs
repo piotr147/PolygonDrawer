@@ -60,6 +60,11 @@ namespace PolygonDrawer.ViewModel
         private bool _deleteVertexNextMove;
         private Vertex _selectedVertex;
         private bool _isVertexMoving;
+        private bool _addVertexNextMove;
+        private bool _polygonMovingMode;
+        private Polygon _capturedPolygon;
+        private (int X, int Y) _capturedPointOfPoly;
+        private bool _isPolygonMoving;
 
         public WriteableBitmap Bitmap
         {
@@ -133,10 +138,28 @@ namespace PolygonDrawer.ViewModel
             set { _isEdgeMoving = value; RaisePropertyChanged(nameof(IsEdgeMoving)); }
         }
 
+        public bool IsPolygonMoving
+        {
+            get { return _isPolygonMoving; }
+            set { _isPolygonMoving = value; RaisePropertyChanged(nameof(IsPolygonMoving)); }
+        }
+
+        public bool PolygonMovingMode
+        {
+            get { return _polygonMovingMode; }
+            set { _polygonMovingMode = value; RaisePropertyChanged(nameof(PolygonMovingMode)); }
+        }
+
         public bool DeleteVertexNextMove
         {
             get { return _deleteVertexNextMove; }
             set { _deleteVertexNextMove = value; RaisePropertyChanged(nameof(DeleteVertexNextMove)); }
+        }
+
+        public bool AddVertexNextMove
+        {
+            get { return _addVertexNextMove; }
+            set { _addVertexNextMove = value; RaisePropertyChanged(nameof(AddVertexNextMove)); }
         }
 
         public Vertex LastVertex
@@ -163,10 +186,22 @@ namespace PolygonDrawer.ViewModel
             set { _capturedEdge = value; RaisePropertyChanged(nameof(CapturedEdge)); }
         }
 
+        public Polygon CapturedPolygon
+        {
+            get { return _capturedPolygon; }
+            set { _capturedPolygon = value; RaisePropertyChanged(nameof(CapturedPolygon)); }
+        }
+
         public (int X, int Y) CapturedPointOfEdge
         {
             get { return _capturedPointOfEdge; }
             set { _capturedPointOfEdge = value; RaisePropertyChanged(nameof(CapturedPointOfEdge)); }
+        }
+
+        public (int X, int Y) CapturedPointOfPoly
+        {
+            get { return _capturedPointOfPoly; }
+            set { _capturedPointOfPoly = value; RaisePropertyChanged(nameof(CapturedPointOfPoly)); }
         }
 
         public RelayCommand<Point> MouseUpOnBitmap
@@ -193,6 +228,17 @@ namespace PolygonDrawer.ViewModel
             private set;
         }
 
+        public RelayCommand AddVertex
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand MovePolygon
+        {
+            get;
+            private set;
+        }
 
 
         public MainViewModel()
@@ -215,8 +261,9 @@ namespace PolygonDrawer.ViewModel
             ChangeMode = new RelayCommand(() => { IsDrawingModeOn = !IsDrawingModeOn;
                 IsMovingModeOn = !IsMovingModeOn;
             }, !DeleteVertexNextMove);
-            DeleteVertex = new RelayCommand(() => { DeleteVertexNextMove = !DeleteVertexNextMove;}, 
-                !IsDrawingModeOn && IsMovingModeOn && !IsEdgeMoving && !IsVertexMoving);
+            DeleteVertex = new RelayCommand(() => { DeleteVertexNextMove = !DeleteVertexNextMove;});
+            AddVertex = new RelayCommand(() => { AddVertexNextMove = !AddVertexNextMove; });
+            MovePolygon = new RelayCommand(() => { PolygonMovingMode = !PolygonMovingMode; });
         }
 
         private void BitmapMove(MouseData obj)
@@ -255,10 +302,44 @@ namespace PolygonDrawer.ViewModel
 
                 CapturedPointOfEdge = (x, y);
 
-                //v1.X++;
-                //v1.Y++;
-                //v2.X++;
-                //v2.Y++;
+                RefreshBitmap();
+            }
+            else if(IsPolygonMoving)
+            {
+                var XMin = CapturedPolygon.Vertices[0].X;
+                var XMax = CapturedPolygon.Vertices[0].X;
+                var YMin = CapturedPolygon.Vertices[0].Y;
+                var YMax = CapturedPolygon.Vertices[0].Y;
+
+                for (int i = 0; i < CapturedPolygon.Vertices.Count; i++)
+                {
+                    if (CapturedPolygon.Vertices[i].X > XMax)
+                        XMax = CapturedPolygon.Vertices[i].X;
+                    if (CapturedPolygon.Vertices[i].X < XMin)
+                        XMin = CapturedPolygon.Vertices[i].X;
+                    if (CapturedPolygon.Vertices[i].Y > YMax)
+                        YMax = CapturedPolygon.Vertices[i].Y;
+                    if (CapturedPolygon.Vertices[i].Y > YMax)
+                        YMax = CapturedPolygon.Vertices[i].Y;
+                }
+
+                if (XMin + x - CapturedPointOfPoly.X < 4)
+                    return;
+                if (YMin + y - CapturedPointOfPoly.Y < 4)
+                    return;
+                if (XMax + x - CapturedPointOfPoly.X > Width - 4)
+                    return;
+                if (YMax + y - CapturedPointOfPoly.Y > Height - 4)
+                    return;
+
+
+                for (int i = 0; i < CapturedPolygon.Vertices.Count; i++)
+                {
+                    CapturedPolygon.Vertices[i].X = CapturedPolygon.Vertices[i].X + x - CapturedPointOfPoly.X;
+                    CapturedPolygon.Vertices[i].Y = CapturedPolygon.Vertices[i].Y + y - CapturedPointOfPoly.Y;
+                }
+
+                CapturedPointOfPoly = (x, y);
 
                 RefreshBitmap();
             }
@@ -307,12 +388,35 @@ namespace PolygonDrawer.ViewModel
             else if (IsMovingModeOn)                            // Moving mode
             {
                 var e = CheckIfOnExistingEdge(x, y);
-                if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving )
+                if (PolygonMovingMode)
+                {
+                    if(!IsPolygonMoving)
+                    {
+                        if(CheckIfOnExistingVertex(x, y))
+                        {
+                            var v = FindCapturedVertex(x, y);
+                            CapturedPolygon = FindPolygonOfVertex(v);
+                            CapturedPointOfPoly = (x, y);
+                        }
+                        else if (e != null)
+                        {
+                            CapturedPolygon = FindPolygonOfVertex(e.V1);
+                            CapturedPointOfPoly = (x, y);
+                        }
+
+                        IsPolygonMoving = true;
+                    }
+                    else if(IsPolygonMoving)
+                    {
+                        IsPolygonMoving = false;
+                    }
+                }
+                else if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving )
                 {
                     IsVertexMoving = true;
                     CapturedVertex = FindCapturedVertex(x, y);
                 }
-                else if (e != null && !IsEdgeMoving && !IsVertexMoving)
+                else if (e != null && !IsEdgeMoving && !IsVertexMoving && !AddVertexNextMove)
                 {
                     CapturedEdge = e;
                     IsEdgeMoving = true;
@@ -328,28 +432,62 @@ namespace PolygonDrawer.ViewModel
                     IsEdgeMoving = false;
                     CapturedEdge = null;
                 }
-            }
-            if (DeleteVertexNextMove)
-            {
-                if (CheckIfOnExistingVertex(x, y))
+                else if (DeleteVertexNextMove)
                 {
-                    SelectedVertex = FindCapturedVertex(x, y);
-
-                    if (FindPolygonOfVertex(SelectedVertex).Vertices.Count < 4)
+                    if (CheckIfOnExistingVertex(x, y))
                     {
+                        SelectedVertex = FindCapturedVertex(x, y);
+
+                        if (FindPolygonOfVertex(SelectedVertex).Vertices.Count < 4)
+                        {
+                            SelectedVertex = null;
+                            DeleteVertexNextMove = false;
+                            return;
+                        }
+
+                        DeleteSelectedVertex(SelectedVertex);
                         SelectedVertex = null;
-                        DeleteVertexNextMove = false;
-                        return;
+
+                        RefreshBitmap();
                     }
 
-                    DeleteSelectedVertex(SelectedVertex);
-                    SelectedVertex = null;
-
-                    RefreshBitmap();
+                    DeleteVertexNextMove = false;
                 }
+                else if (AddVertexNextMove)
+                {
+                    
 
-                DeleteVertexNextMove = false;
+                    if (e != null)
+                    {
+                        var poly = FindPolygonOfVertex(e.V1);
+                        var v1 = e.V1;
+                        var v2 = e.V2;
+                        var index = poly.Vertices.IndexOf(e.V1) > poly.Vertices.IndexOf(e.V2) ?
+                            poly.Vertices.IndexOf(e.V1) : poly.Vertices.IndexOf(e.V2);
+
+                        var vnew = new Vertex((v1.X + v2.X) / 2, (v1.Y + v2.Y) / 2);
+
+                        poly.Vertices.Insert(index + 1, vnew);
+                        Vertices.Add(vnew);
+                        Edges.Remove(e);
+                        poly.Edges.Remove(e);
+
+                        var e1 = new Edge(v1, vnew);
+                        var e2 = new Edge(v2, vnew);
+
+                        Edges.Add(e1);
+                        Edges.Add(e2);
+                        poly.Edges.Add(e1);
+                        poly.Edges.Add(e2);
+
+
+                        RefreshBitmap();
+                    }
+
+                    AddVertexNextMove = false;
+                }
             }
+            
 
         }
 
