@@ -62,6 +62,10 @@
             </Button>
             <TextBlock Text="{Binding PolygonMovingMode}">
             </TextBlock>
+            <Button Content="Set equal length" Command="{Binding SetEqRelation}">
+            </Button>
+            <TextBlock Text="{Binding SettingEqRelMode}">
+            </TextBlock>
         </StackPanel>
 
     </Grid>
