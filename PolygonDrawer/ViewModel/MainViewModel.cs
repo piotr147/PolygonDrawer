@@ -368,6 +368,18 @@ namespace PolygonDrawer.ViewModel
                     ruszyc = false;
                 }
 
+                if (CapturedVertex.E1.RelType == TypeOfRelation.Parallel)
+                {
+                    poly.KeepParallel(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
+                    ruszyc = false;
+                }
+
+                if (CapturedVertex.E2.RelType == TypeOfRelation.Parallel)
+                {
+                    poly.KeepParallel(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
+                    ruszyc = false;
+                }
+
                 if (ruszyc)
                 {
                     CapturedVertex.X = x;
@@ -421,6 +433,22 @@ namespace PolygonDrawer.ViewModel
                     ruszyc = false;
                     e2rusz = e2ok;
                 }
+
+                if (e1.RelType == TypeOfRelation.Parallel)
+                {
+                    e1ok = poly.KeepParallel(e1, e1.RelatedEdge, v1, v1.X + x - CapturedPointOfEdge.X, v1.Y + y - CapturedPointOfEdge.Y, e1, 0);
+                    ruszyc = false;
+                    e1rusz = e1ok;
+                }
+
+                if (e2.RelType == TypeOfRelation.Parallel)
+                {
+                    e2ok = poly.KeepParallel(e2, e2.RelatedEdge, v2, v2.X + x - CapturedPointOfEdge.X, v2.Y + y - CapturedPointOfEdge.Y, e2, 0);
+                    ruszyc = false;
+                    e2rusz = e2ok;
+                }
+
+
 
 
 
@@ -551,10 +579,21 @@ namespace PolygonDrawer.ViewModel
                 {
                     if(EqRelE1 == null)
                     {
+                        if (e.RelType != TypeOfRelation.None)
+                        {
+                            SettingEqRelMode = false;
+                            return;
+                        }
                         EqRelE1 = e;
                     }
                     else if(EqRelE2 == null)
                     {
+                        if (e.RelType != TypeOfRelation.None)
+                        {
+                            EqRelE1 = null;
+                            SettingEqRelMode = false;
+                            return;
+                        }
                         EqRelE1.RelatedEdge = e;
                         EqRelE1.RelType = TypeOfRelation.Equal;
                         e.RelatedEdge = EqRelE1;
@@ -574,10 +613,22 @@ namespace PolygonDrawer.ViewModel
                 {
                     if (ParRelE1 == null)
                     {
+                        if (e.RelType != TypeOfRelation.None)
+                        {
+                            SettingParRelMode = false;
+                            return;
+                        }
                         ParRelE1 = e;
                     }
                     else if (ParRelE2 == null)
                     {
+                        if(!(ParRelE1.V1.E1 != e && ParRelE1.V1.E2 != e && ParRelE1.V2.E1 != e && ParRelE1.V2.E2 != e) 
+                           || e.RelType != TypeOfRelation.None)
+                        {
+                            ParRelE1 = null;
+                            SettingParRelMode = false;
+                            return;
+                        }
                         ParRelE1.RelatedEdge = e;
                         ParRelE1.RelType = TypeOfRelation.Parallel;
                         e.RelatedEdge = EqRelE1;

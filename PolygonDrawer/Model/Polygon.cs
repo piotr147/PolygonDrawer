@@ -71,7 +71,9 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (true) //can be changed
+                //if (true) //can be changed
+                if(CanBeSet(movE, anV, x, y, startEdge, circles) 
+                   && CanBeSet(movE, movV, xTo, yTo, startEdge, circles))
                 {
                     anV.X = x;
                     anV.Y = y;
@@ -99,7 +101,8 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (true) //can be changed
+                //if (true) //can be changed
+                if(CanBeSet(e2, v2, x, y, startEdge, circle))
                 {
                     v2.X = x;
                     v2.Y = y;
@@ -114,7 +117,8 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (true) //can be changed
+                //if (true) //can be changed
+                if(CanBeSet(e2, v1, x, y, startEdge, circle))
                 {
                     v1.X = x;
                     v1.Y = y;
@@ -135,7 +139,8 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (true) //can be changed
+                //if (true) //can be changed
+                if(CanBeSet(e1, v2, x, y, startEdge, circle))
                 {
                     v2.X = x;
                     v2.Y = y;
@@ -150,7 +155,8 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (true) //can be changed
+                //if (true) //can be changed
+                if(CanBeSet(e1, v1, x, y, startEdge, circle))
                 {
                     v1.X = x;
                     v1.Y = y;
@@ -163,114 +169,140 @@ namespace PolygonDrawer.Model
         }
 
 
-        public bool SetParallel(Edge e1, Edge e2, Edge startEdge, int circle)
+        public bool KeepParallel(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles)
         {
+            
+
+            var anV = movE.V1 != movV ? movE.V1 : movE.V2;
+
+            var x = anV.X;
+            var y = anV.Y;
+
+            x = x + xTo - movV.X;
+            y = y + yTo - movV.Y;
+
+            if (x > 4 && x < width - 4 && y > 4 && y < height - 4)
+            {
+                //if (true) // can be moved
+                if(CanBeSet(movE, movV, xTo, yTo, startEdge, circles) 
+                   && CanBeSet(movE, anV, x, y, startEdge, circles))
+                {
+                    movV.X = xTo;
+                    movV.Y = yTo;
+                    anV.X = x;
+                    anV.Y = y;
+                    return true;
+                }
+            }
+
+
+            return false;
+        }
+
+        public bool SetParallel(Edge e1, Edge e2, Edge startEdge, int circle)
+        { 
 
             if (e1.V1.X != e1.V2.X)
             {
                 var wantedTan = Tan(e1.V1.X, e1.V1.Y, e1.V2.X, e1.V2.Y);
-                Vertex v1;
-                Vertex v2;
-                if(e2.V1.X > e2.V2.X)
+
+                var v1 = e2.V1;
+                var v2 = e2.V2;
+
+                var x = v1.X;
+                var y = v1.Y;
+                x = v2.X + (int)((double)(v1.Y - v2.Y) / wantedTan);
+
+                if (x > 4 && x < width - 4)
                 {
-                    v2 = e2.V1;
-                    v1 = e2.V2;
-                }
-                else
-                {
-                    v1 = e2.V1;
-                    v2 = e2.V2;
+                    //if (true) //can be moved
+                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circle))
+                    {
+                        v1.X = x;
+                        return true;
+                    }
                 }
 
-                int furthest = v2.X;
-                if (furthest < v2.Y)
-                    furthest = v2.Y;
-                if (furthest < height - v2.Y)
-                    furthest = height - v2.Y;
-                if(furthest < width - v2.X)
-                    furthest = width - v2.X;
-                int x = v2.X;
-                int y = v2.Y;
+                x = v1.X;
 
-                for(int i = 0; i < furthest - 4; i++)
+                y = v2.Y + (int) ((double) (v1.X - v2.X) / wantedTan);
+                if (y > 4 && y < height - 4)
                 {
-
-                    if (CheckAndSet(wantedTan, v2, x + i, y, v1))
+                    //if(true) //can be moved
+                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circle))
+                    {
+                        v1.Y = y;
                         return true;
-                    if (CheckAndSet(wantedTan, v2, x - i, y, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x, y + i, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x, y - i, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x + i, y + i, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x + i, y - i, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x - i, y + i, v1))
-                        return true;
-                    if (CheckAndSet(wantedTan, v2, x - i, y - i, v1))
-                        return true;
+                    }
                 }
+
+                v1 = e2.V2;
+                v2 = e2.V1;
 
                 x = v1.X;
                 y = v1.Y;
 
-                furthest = v1.X;
-                if (furthest < v1.Y)
-                    furthest = v1.Y;
-                if (furthest < height - v1.Y)
-                    furthest = height - v1.Y;
-                if (furthest < width - v1.X)
-                    furthest = width - v1.X;
+                x = v2.X + (int)((double)(v1.Y - v2.Y) / wantedTan);
 
-                for (int i = 0; i < furthest - 4; i++)
+                if (x > 4 && x < width - 4)
                 {
+                    //if (true) //can be moved
+                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circle))
+                    {
+                        v1.X = x;
+                        return true;
+                    }
+                }
 
-                    if (CheckAndSet(wantedTan, v1, x + i, y, v2))
+                x = v1.X;
+
+                y = v2.Y + (int)((double)(v1.X - v2.X) / wantedTan);
+                if (y > 4 && y < height - 4)
+                {
+                    //if (true) //can be moved
+                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circle))
+                    {
+                        v1.Y = y;
                         return true;
-                    if (CheckAndSet(wantedTan, v1, x - i, y, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x, y + i, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x, y - i, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x + i, y + i, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x + i, y - i, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x - i, y + i, v2))
-                        return true;
-                    if (CheckAndSet(wantedTan, v1, x - i, y - i, v2))
-                        return true;
+                    }
                 }
             }
-            else // tan == inf
+            else // x != x
             {
+                //if (true) //can be moved
+                if(CanBeSet(e2, e2.V1, e2.V2.X, e2.V1.Y, startEdge, circle))
+                {
+                    e2.V1.X = e2.V2.X;
+                    return true;
+                }
 
+                //if (true) //can be moved
+                if(CanBeSet(e2, e2.V2, e2.V1.X, e2.V2.Y, startEdge, circle))
+                {
+                    e2.V2.X = e2.V1.X;
+                    return true;
+                }
             }
 
-
-            
             return false;
         }
 
 
         public bool CanBeSet(Edge anE, Vertex v2, int x, int y, Edge startEdge, int circle)
         {
-            if (anE.RelType == TypeOfRelation.None)
-            {
-                return true;
-            }
-            else if (anE.RelType == TypeOfRelation.Equal)
-            {
-                var anV = anE.V1 != v2 ? anE.V1 : anE.V2;
+            //if (anE.RelType == TypeOfRelation.None)
+            //{
+            //    return true;
+            //}
+            //else if (anE.RelType == TypeOfRelation.Equal)
+            //{
+            //    var anV = anE.V1 != v2 ? anE.V1 : anE.V2;
 
-                if (anE.RelatedEdge.Length + 10 >= Length(anV.X, anV.Y, x, y))
-                    return true;
-                else
-                    return false;
-            }
+            //    if (anE.RelatedEdge.Length + 10 >= Length(anV.X, anV.Y, x, y))
+            //        return true;
+            //    else
+            //        return false;
+            //}
             return true;
         }
 
