@@ -69,6 +69,9 @@ namespace PolygonDrawer.ViewModel
         private bool _settingEqRelMode;
         private Edge _eqRelE1;
         private Edge _eqRelE2;
+        private bool _settingParRelMode;
+        private Edge _parRelE1;
+        private Edge _parRelE2;
 
         public WriteableBitmap Bitmap
         {
@@ -160,6 +163,12 @@ namespace PolygonDrawer.ViewModel
             set { _settingEqRelMode = value; RaisePropertyChanged(nameof(SettingEqRelMode)); }
         }
 
+        public bool SettingParRelMode
+        {
+            get { return _settingParRelMode; }
+            set { _settingParRelMode = value; RaisePropertyChanged(nameof(SettingParRelMode)); }
+        }
+
         public bool DeleteVertexNextMove
         {
             get { return _deleteVertexNextMove; }
@@ -211,6 +220,17 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _eqRelE2; }
             set { _eqRelE2 = value; RaisePropertyChanged(nameof(EqRelE2)); }
+        }
+
+        public Edge ParRelE1
+        {
+            get { return _parRelE1; }
+            set { _parRelE1 = value; RaisePropertyChanged(nameof(ParRelE1)); }
+        }
+        public Edge ParRelE2
+        {
+            get { return _parRelE2; }
+            set { _parRelE2 = value; RaisePropertyChanged(nameof(ParRelE2)); }
         }
 
         public (int X, int Y) CapturedPointOfEdge
@@ -267,6 +287,18 @@ namespace PolygonDrawer.ViewModel
             private set;
         }
 
+        public RelayCommand SetParRelation
+        {
+            get;
+            private set;
+        }
+
+        public RelayCommand ClearBitmap
+        {
+            get;
+            private set;
+        }
+
 
         public MainViewModel()
         {
@@ -296,6 +328,19 @@ namespace PolygonDrawer.ViewModel
             AddVertex = new RelayCommand(() => { AddVertexNextMove = !AddVertexNextMove; });
             MovePolygon = new RelayCommand(() => { PolygonMovingMode = !PolygonMovingMode; });
             SetEqRelation = new RelayCommand(() => { SettingEqRelMode = !SettingEqRelMode; });
+            SetParRelation = new RelayCommand(() => { SettingParRelMode = !SettingParRelMode; });
+            ClearBitmap = new RelayCommand(() =>
+            {
+                if (!IsDrawingModeOn)
+                {
+                    Polygons = new ObservableCollection<Polygon>();
+                    Vertices = new ObservableCollection<Vertex>();
+                    Edges = new ObservableCollection<Edge>();
+                    VerticesInProgress = new ObservableCollection<Vertex>();
+                    EdgesInProgress = new ObservableCollection<Edge>();
+                }
+                RefreshBitmap();
+            });
         }
 
         private void BitmapMove(MouseData obj)
@@ -313,13 +358,13 @@ namespace PolygonDrawer.ViewModel
 
                 if (CapturedVertex.E1.RelType == TypeOfRelation.Equal)
                 {
-                    poly.KeepEqualLength(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1);
+                    poly.KeepEqualLength(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
                     ruszyc = false;
                 }
 
                 if (CapturedVertex.E2.RelType == TypeOfRelation.Equal)
                 {
-                    poly.KeepEqualLength(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2);
+                    poly.KeepEqualLength(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
                     ruszyc = false;
                 }
 
@@ -365,14 +410,14 @@ namespace PolygonDrawer.ViewModel
 
                 if (e1.RelType == TypeOfRelation.Equal)
                 {
-                    e1ok = poly.KeepEqualLength(e1, e1.RelatedEdge, v1, v1.X + x - CapturedPointOfEdge.X, v1.Y + y - CapturedPointOfEdge.Y, e1);
+                    e1ok = poly.KeepEqualLength(e1, e1.RelatedEdge, v1, v1.X + x - CapturedPointOfEdge.X, v1.Y + y - CapturedPointOfEdge.Y, e1, 0);
                     ruszyc = false;
                     e1rusz = e1ok;
                 }
 
                 if (e2.RelType == TypeOfRelation.Equal)
                 {
-                    e2ok = poly.KeepEqualLength(e2, e2.RelatedEdge, v2, v2.X + x - CapturedPointOfEdge.X, v2.Y + y - CapturedPointOfEdge.Y, e2);
+                    e2ok = poly.KeepEqualLength(e2, e2.RelatedEdge, v2, v2.X + x - CapturedPointOfEdge.X, v2.Y + y - CapturedPointOfEdge.Y, e2, 0);
                     ruszyc = false;
                     e2rusz = e2ok;
                 }
@@ -516,11 +561,34 @@ namespace PolygonDrawer.ViewModel
                         e.RelType = TypeOfRelation.Equal;
 
                         var poly = FindPolygonOfVertex(e.V1);
-                        var success = poly.SetEqualLength(EqRelE1, e);
+                        var success = poly.SetEqualLength(EqRelE1, e, e, 0);
 
                         EqRelE1 = null;
                         EqRelE2 = null;
                         SettingEqRelMode = false;
+
+                        RefreshBitmap();
+                    }
+                }
+                else if (SettingParRelMode)
+                {
+                    if (ParRelE1 == null)
+                    {
+                        ParRelE1 = e;
+                    }
+                    else if (ParRelE2 == null)
+                    {
+                        ParRelE1.RelatedEdge = e;
+                        ParRelE1.RelType = TypeOfRelation.Parallel;
+                        e.RelatedEdge = EqRelE1;
+                        e.RelType = TypeOfRelation.Parallel;
+
+                        var poly = FindPolygonOfVertex(e.V1);
+                        var success = poly.SetParallel(ParRelE1, e, e, 0);
+
+                        ParRelE1 = null;
+                        ParRelE2 = null;
+                        SettingParRelMode = false;
 
                         RefreshBitmap();
                     }
@@ -742,20 +810,28 @@ namespace PolygonDrawer.ViewModel
 
         public void RefreshBitmap()
         {
-            WriteableBitmap bitmap2 = new WriteableBitmap(Width, Height, 96, 96, PixelFormats.Bgr32, null);
+            //WriteableBitmap bitmap2 = new WriteableBitmap(Width, Height, 96, 96, PixelFormats.Bgr32, null);
+
+            byte[] pixels1d = new byte[Width * Height * 4];
+            Int32Rect rect = new Int32Rect(0, 0, Width, Height);
+            int stride = 4 * Width;
+            Bitmap.WritePixels(rect, pixels1d, stride, 0);
+
+
 
             foreach (var poly in Polygons)
             {
                 var firstV = poly.Vertices[0];
                 for (int i = 0; i < poly.Vertices.Count; i++)
                 {
-                    Drawer.DrawVertex(bitmap2, poly.Vertices[i]);
-                    Drawer.DrawEdge(bitmap2, poly.Vertices[i], poly.Vertices[(i + 1) % poly.Vertices.Count]);
+                    //Drawer.DrawVertex(bitmap2, poly.Vertices[i]);
+                    //Drawer.DrawEdge(bitmap2, poly.Vertices[i], poly.Vertices[(i + 1) % poly.Vertices.Count]);
+                    Drawer.DrawVertex(Bitmap, poly.Vertices[i]);
+                    Drawer.DrawEdge(Bitmap, poly.Vertices[i], poly.Vertices[(i + 1) % poly.Vertices.Count]);
                 }
             }
 
-            Bitmap = bitmap2;
-
+            //Bitmap = bitmap2;
         }
     }
 }

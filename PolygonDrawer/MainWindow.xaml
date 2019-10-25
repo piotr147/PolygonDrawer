@@ -28,7 +28,7 @@
 
         <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Visible">
             <Canvas>
-                <Border BorderThickness="2" BorderBrush="Black">
+                <Border BorderThickness="2" BorderBrush="Black" Background="Black">
                     <Image x:Name="Im" Grid.Column="0" Source="{Binding Bitmap}" >
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="MouseUp">
@@ -66,6 +66,12 @@
             </Button>
             <TextBlock Text="{Binding SettingEqRelMode}">
             </TextBlock>
+            <Button Content="Set parallel" Command="{Binding SetParRelation}">
+            </Button>
+            <TextBlock Text="{Binding SettingParRelMode}">
+            </TextBlock>
+            <Button Content="Clear" Command="{Binding ClearBitmap}">
+            </Button>
         </StackPanel>
 
     </Grid>

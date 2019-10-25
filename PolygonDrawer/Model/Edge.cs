@@ -84,28 +84,5 @@ namespace PolygonDrawer.Model
             RelType = TypeOfRelation.None;
         }
 
-        //public bool TryToAdjustEdge(int len, Vertex v)
-        //{
-        //    var anV = V1 == v ? V2 : V1;
-        //    var anE = anV.E1 == this ? anV.E2 : anV.E1;
-
-        //    if (anE.CanBeMoved())
-        //    {
-
-
-
-
-
-        //    }
-
-
-        //}
-
-        public bool CanBeMoved()
-        {
-            return RelatedEdge == null;
-        }
-
-        //public bool CanBeMovedHere(int)
     }
 }
