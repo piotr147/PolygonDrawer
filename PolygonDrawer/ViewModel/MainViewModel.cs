@@ -421,7 +421,8 @@ namespace PolygonDrawer.ViewModel
             Height = Convert.ToInt32(ConfigurationSettings.AppSettings["bitmapHeight"]);
             Bitmap = new WriteableBitmap(Width, Height, 96, 96, PixelFormats.Bgr32, null);
             IsFirstVertexOfEdge = true;
-            IsDrawingModeOn = true;
+            IsDrawingModeOn = false;
+            IsMovingModeOn = true;
             Vertices = new ObservableCollection<Vertex>();
             Edges = new ObservableCollection<Edge>();
             Polygons = new ObservableCollection<Polygon>();
@@ -437,7 +438,7 @@ namespace PolygonDrawer.ViewModel
             colors.Add((255, 0, 255));
             colors.Add((255, 255, 0));
 
-
+            AddInitialPolygon();
 
             MouseUpOnBitmap = new RelayCommand<Point>(BitmapUpClick, true);
             MouseMoveOnBitmap = new RelayCommand<MouseData>(BitmapMove, true);
@@ -456,7 +457,7 @@ namespace PolygonDrawer.ViewModel
             SetParRelation = new RelayCommand(() => { SettingParRelMode = !SettingParRelMode; });
             ClearBitmap = new RelayCommand(() =>
             {
-                if (!IsDrawingModeOn)
+                //if (!IsDrawingModeOn)
                 {
                     Polygons = new ObservableCollection<Polygon>();
                     Vertices = new ObservableCollection<Vertex>();
@@ -464,12 +465,57 @@ namespace PolygonDrawer.ViewModel
                     VerticesInProgress = new ObservableCollection<Vertex>();
                     EdgesInProgress = new ObservableCollection<Edge>();
                     RelationCounter = 0;
+                    LastVertex = null;
+                    FirstVertexOfPolygonInProgress = null;
+                    RefreshBitmap();
                 }
-                RefreshBitmap();
             });
 
             //DeleteVertexButtonEnabled = IsMovingModeOn && !PolygonMovingMode && !SettingEqRelMode && !SettingParRelMode && !AddVertexNextMove;
 
+        }
+
+        private void AddInitialPolygon()
+        {
+            Vertex[] initV = new Vertex[7];
+            initV[0] = new Vertex(581, 111);
+            initV[1] = new Vertex(646, 75);
+            initV[2] = new Vertex(222, 159);
+            initV[3] = new Vertex(210, 516);
+            initV[4] = new Vertex(708, 672);
+            initV[5] = new Vertex(1006, 508);
+            initV[6] = new Vertex(1004, 151);
+
+            Edge[] initE = new Edge[7];
+            for (int i = 0; i < initE.Length; i++)
+                initE[i] = new Edge(initV[i], initV[(i + 1) % initE.Length]);
+
+            initE[0].RelType = TypeOfRelation.Parallel;
+            initE[0].RelatedEdge = initE[4];
+            initE[4].RelType = TypeOfRelation.Parallel;
+            initE[4].RelatedEdge = initE[0];
+
+            initE[2].RelType = TypeOfRelation.Equal;
+            initE[2].RelatedEdge = initE[5];
+            initE[5].RelType = TypeOfRelation.Equal;
+            initE[5].RelatedEdge = initE[2];
+
+            for(int i = 0; i < initV.Length; i++)
+            {
+                initV[i].AddEdge(initE[i]);
+                initV[i].AddEdge(initE[(i + initV.Length - 1) % initV.Length]);
+
+                EdgesInProgress.Add(initE[i]);
+                VerticesInProgress.Add(initV[i]);
+                Edges.Add(initE[i]);
+                Vertices.Add(initV[i]);
+            }
+
+            Polygons.Add(new Polygon(VerticesInProgress, EdgesInProgress));
+            VerticesInProgress = new ObservableCollection<Vertex>();
+            EdgesInProgress = new ObservableCollection<Edge>();
+
+            RefreshBitmap();
         }
 
         private void BitmapMove(MouseData obj)
@@ -719,7 +765,7 @@ namespace PolygonDrawer.ViewModel
                         }
                         else if (EqRelE2 == null)
                         {
-                            if (e.RelType != TypeOfRelation.None)
+                            if (e.RelType != TypeOfRelation.None || e == EqRelE1)
                             {
                                 EqRelE1 = null;
                                 SettingEqRelMode = false;
@@ -762,7 +808,7 @@ namespace PolygonDrawer.ViewModel
                         else if (ParRelE2 == null)
                         {
                             if (!(ParRelE1.V1.E1 != e && ParRelE1.V1.E2 != e && ParRelE1.V2.E1 != e && ParRelE1.V2.E2 != e)
-                                || e.RelType != TypeOfRelation.None)
+                                || e.RelType != TypeOfRelation.None || e == ParRelE1)
                             {
                                 ParRelE1 = null;
                                 SettingParRelMode = false;
@@ -812,12 +858,12 @@ namespace PolygonDrawer.ViewModel
                         IsPolygonMoving = false;
                     }
                 }
-                else if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving )
+                else if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving && !DeleteVertexNextMove && !AddVertexNextMove)
                 {
                     IsVertexMoving = true;
                     CapturedVertex = FindCapturedVertex(x, y);
                 }
-                else if (e != null && !IsEdgeMoving && !IsVertexMoving && !AddVertexNextMove)
+                else if (e != null && !IsEdgeMoving && !IsVertexMoving && !AddVertexNextMove && !DeleteVertexNextMove)
                 {
                     CapturedEdge = e;
                     IsEdgeMoving = true;
@@ -841,6 +887,17 @@ namespace PolygonDrawer.ViewModel
 
                         if (FindPolygonOfVertex(SelectedVertex).Vertices.Count < 4)
                         {
+                            if(SelectedVertex.E1.RelType != TypeOfRelation.None)
+                            {
+                                SelectedVertex.E1.RelType = TypeOfRelation.None;
+                                SelectedVertex.E1.RelatedEdge.RelType = TypeOfRelation.None;
+                            }
+                            if (SelectedVertex.E2.RelType != TypeOfRelation.None)
+                            {
+                                SelectedVertex.E2.RelType = TypeOfRelation.None;
+                                SelectedVertex.E2.RelatedEdge.RelType = TypeOfRelation.None;
+                            }
+
                             SelectedVertex = null;
                             DeleteVertexNextMove = false;
                             return;
@@ -858,7 +915,7 @@ namespace PolygonDrawer.ViewModel
                 {
                     
 
-                    if (e != null)
+                    if (e != null && e.RelType == TypeOfRelation.None)
                     {
                         var poly = FindPolygonOfVertex(e.V1);
                         var v1 = e.V1;
@@ -954,7 +1011,7 @@ namespace PolygonDrawer.ViewModel
         {
             foreach (var v in Vertices)
             {
-                if (x >= v.X - 2 && x <= v.X + 2 && y >= v.Y - 2 && y <= v.Y + 2)
+                if (x >= v.X - 3 && x <= v.X + 3 && y >= v.Y - 3 && y <= v.Y + 3)
                     return true;
             }
 
@@ -976,7 +1033,7 @@ namespace PolygonDrawer.ViewModel
         {
             foreach (var v in Vertices)
             {
-                if (x >= v.X - 2 && x <= v.X + 2 && y >= v.Y - 2 && y <= v.Y + 2)
+                if (x >= v.X - 3 && x <= v.X + 3 && y >= v.Y - 3 && y <= v.Y + 3)
                     return v;
             }
 

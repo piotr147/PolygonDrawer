@@ -269,7 +269,7 @@ namespace PolygonDrawer.ViewModel
                     xe = x1;
                 }
 
-                if (x <= xs + 2 && x >= xs - 2 && y <= ys + 2 && y >= ys - 2)
+                if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
                     return true;
 
                 // Rasterize the line
@@ -298,7 +298,7 @@ namespace PolygonDrawer.ViewModel
 
                     // Draw pixel from line span at
                     // currently rasterized position
-                    if (x <= xs + 2 && x >= xs - 2 && y <= ys + 2 && y >= ys - 2)
+                    if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
                         return true;
                 }
 
@@ -322,7 +322,7 @@ namespace PolygonDrawer.ViewModel
                     ye = y1;
                 }
 
-                if (x <= xs + 2 && x >= xs - 2 && y <= ys + 2 && y >= ys - 2)
+                if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
                     return true;
 
                 // Rasterize the line
@@ -351,7 +351,7 @@ namespace PolygonDrawer.ViewModel
 
                     // Draw pixel from line span at
                     // currently rasterized position
-                    if (x <= xs + 2 && x >= xs -2 && y <= ys + 2 && y >= ys - 2)
+                    if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
                         return true;
                 }
             }
@@ -391,7 +391,7 @@ namespace PolygonDrawer.ViewModel
             return true;
         }
 
-        private static void DrawColorVertexPar(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
+        private static void DrawColorVertexEq(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
         {
             for (int i = -4; i <= 4; i++)
             {
@@ -402,7 +402,7 @@ namespace PolygonDrawer.ViewModel
             }
         }
 
-        private static void DrawColorVertexEq(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
+        private static void DrawColorVertexPar(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
         {
             for (int i = -4; i <= 4; i++)
             {
