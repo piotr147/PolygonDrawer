@@ -46,31 +46,37 @@
         </ScrollViewer>
 
         <StackPanel Grid.Column="1">
-            <Button Content="Drawing Mode ?" Command="{Binding ChangeMode}">
+            <Button Name="ModeButton" Content="Drawing Mode ?" Command="{Binding ChangeMode}"
+                    IsEnabled="{Binding ModeButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding IsDrawingModeOn}">
             </TextBlock>
-            <Button Content ="Delete Vertex" Command="{Binding DeleteVertex}">
+            <Button Name="DeleteVertexButton" Content ="Delete Vertex" Command="{Binding DeleteVertex}" 
+                    IsEnabled="{Binding DeleteVertexButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding DeleteVertexNextMove}">
             </TextBlock>
-            <Button Content="Add Vertex" Command="{Binding AddVertex}">
+            <Button Name="AddVertexButton" Content="Add Vertex" Command="{Binding AddVertex}"
+                    IsEnabled="{Binding AddVertexButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding AddVertexNextMove}">
             </TextBlock>
-            <Button Content="Move Polygon" Command="{Binding MovePolygon}">
+            <Button Name="MovePolygonButton" Content="Move Polygon" Command="{Binding MovePolygon}"
+                    IsEnabled="{Binding MovePolygonButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding PolygonMovingMode}">
             </TextBlock>
-            <Button Content="Set equal length" Command="{Binding SetEqRelation}">
+            <Button Name="SetEqualLengthButton" Content="Set equal length" Command="{Binding SetEqRelation}"
+                    IsEnabled="{Binding SetEqualLengthButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding SettingEqRelMode}">
             </TextBlock>
-            <Button Content="Set parallel" Command="{Binding SetParRelation}">
+            <Button Name="SetParallelButton" Content="Set parallel" Command="{Binding SetParRelation}"
+                    IsEnabled="{Binding SetParallelButtonEnabled}">
             </Button>
             <TextBlock Text="{Binding SettingParRelMode}">
             </TextBlock>
-            <Button Content="Clear" Command="{Binding ClearBitmap}">
+            <Button Name="ClearButton" Content="Clear" Command="{Binding ClearBitmap}">
             </Button>
         </StackPanel>
 
