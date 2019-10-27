@@ -93,6 +93,11 @@ namespace PolygonDrawer.Model
             var v2 = e2.V1 != v1 ? e2.V1 : e2.V2;
             var currentLength = e2.Length;
 
+
+            //if((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2))
+            //{
+
+            //}
             var x = v2.X;
             var y = v2.Y;
 
@@ -104,9 +109,13 @@ namespace PolygonDrawer.Model
                 //if (true) //can be changed
                 if(CanBeSet(e2, v2, x, y, startEdge, circle))
                 {
-                    v2.X = x;
-                    v2.Y = y;
-                    return true;
+                    //if ((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2))
+                    if (!((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2)))
+                    {
+                        v2.X = x;
+                        v2.Y = y;
+                        return true;
+                    }
                 }
             }
 
@@ -120,9 +129,13 @@ namespace PolygonDrawer.Model
                 //if (true) //can be changed
                 if(CanBeSet(e2, v1, x, y, startEdge, circle))
                 {
-                    v1.X = x;
-                    v1.Y = y;
-                    return true;
+                    //if ((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2))
+                    if (!((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2)))
+                    {
+                        v1.X = x;
+                        v1.Y = y;
+                        return true;
+                    }
                 }
             }
 
@@ -142,9 +155,13 @@ namespace PolygonDrawer.Model
                 //if (true) //can be changed
                 if(CanBeSet(e1, v2, x, y, startEdge, circle))
                 {
-                    v2.X = x;
-                    v2.Y = y;
-                    return true;
+                    //if ((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2))
+                    if (!((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2)))
+                    {
+                        v2.X = x;
+                        v2.Y = y;
+                        return true;
+                    }
                 }
             }
 
@@ -158,9 +175,13 @@ namespace PolygonDrawer.Model
                 //if (true) //can be changed
                 if(CanBeSet(e1, v1, x, y, startEdge, circle))
                 {
-                    v1.X = x;
-                    v1.Y = y;
-                    return true;
+                    //if ((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2))
+                    if(!((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2)))
+                    {
+                        v1.X = x;
+                        v1.Y = y;
+                        return true;
+                    }
                 }
             }
 
@@ -290,6 +311,10 @@ namespace PolygonDrawer.Model
 
         public bool CanBeSet(Edge anE, Vertex v2, int x, int y, Edge startEdge, int circle)
         {
+            var e2 = anE != v2.E1 ? v2.E1 : v2.E2;
+
+            return e2.RelType == TypeOfRelation.None;
+
             //if (anE.RelType == TypeOfRelation.None)
             //{
             //    return true;
@@ -303,7 +328,7 @@ namespace PolygonDrawer.Model
             //    else
             //        return false;
             //}
-            return true;
+            //return true;
         }
 
         public bool AdjustLenRel(Edge EMoving, int Xf, int Yf, int Xt, int Yt)//, Edge EToMove)

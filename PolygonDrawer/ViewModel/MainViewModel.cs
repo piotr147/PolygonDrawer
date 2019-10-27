@@ -43,6 +43,9 @@ namespace PolygonDrawer.ViewModel
             }
         }
         #endregion
+
+        private List<(int r, int g, int b)> colors;
+
         private WriteableBitmap _bitmap;
         private ObservableCollection<Vertex> _vertices;
         private ObservableCollection<Edge> _edges;
@@ -72,7 +75,13 @@ namespace PolygonDrawer.ViewModel
         private bool _settingParRelMode;
         private Edge _parRelE1;
         private Edge _parRelE2;
+        private int _relationCounter;
 
+        public int RelationCounter
+        {
+            get { return _relationCounter; }
+            set { _relationCounter = value; RaisePropertyChanged(nameof(RelationCounter)); }
+        }
         public WriteableBitmap Bitmap
         {
             get { return _bitmap; }
@@ -312,6 +321,15 @@ namespace PolygonDrawer.ViewModel
             Polygons = new ObservableCollection<Polygon>();
             VerticesInProgress = new ObservableCollection<Vertex>();
             EdgesInProgress = new ObservableCollection<Edge>();
+            colors = new List<(int r, int g, int b)>();
+            RelationCounter = 0;
+
+            colors.Add((0, 255, 0));
+            colors.Add((0, 0, 255));
+            colors.Add((0, 255, 255));
+            colors.Add((255, 255, 255));
+            colors.Add((255, 0, 255));
+            colors.Add((255, 255, 0));
 
 
 
@@ -338,6 +356,7 @@ namespace PolygonDrawer.ViewModel
                     Edges = new ObservableCollection<Edge>();
                     VerticesInProgress = new ObservableCollection<Vertex>();
                     EdgesInProgress = new ObservableCollection<Edge>();
+                    RelationCounter = 0;
                 }
                 RefreshBitmap();
             });
@@ -577,71 +596,87 @@ namespace PolygonDrawer.ViewModel
                 var e = CheckIfOnExistingEdge(x, y);
                 if(SettingEqRelMode && e != null)
                 {
-                    if(EqRelE1 == null)
+                    if (RelationCounter < 6)
                     {
-                        if (e.RelType != TypeOfRelation.None)
+                        if (EqRelE1 == null)
                         {
-                            SettingEqRelMode = false;
-                            return;
+                            if (e.RelType != TypeOfRelation.None)
+                            {
+                                SettingEqRelMode = false;
+                                return;
+                            }
+                            EqRelE1 = e;
                         }
-                        EqRelE1 = e;
-                    }
-                    else if(EqRelE2 == null)
-                    {
-                        if (e.RelType != TypeOfRelation.None)
+                        else if (EqRelE2 == null)
                         {
+                            if (e.RelType != TypeOfRelation.None)
+                            {
+                                EqRelE1 = null;
+                                SettingEqRelMode = false;
+                                return;
+                            }
+
+                            var poly = FindPolygonOfVertex(e.V1);
+                            var success = poly.SetEqualLength(EqRelE1, e, e, 0);
+
+                            if(success)
+                            {
+                                EqRelE1.RelatedEdge = e;
+                                EqRelE1.RelType = TypeOfRelation.Equal;
+                                e.RelatedEdge = EqRelE1;
+                                e.RelType = TypeOfRelation.Equal;
+                            }
+
                             EqRelE1 = null;
+                            EqRelE2 = null;
                             SettingEqRelMode = false;
-                            return;
+                            RelationCounter++;
+
+                            RefreshBitmap();
                         }
-                        EqRelE1.RelatedEdge = e;
-                        EqRelE1.RelType = TypeOfRelation.Equal;
-                        e.RelatedEdge = EqRelE1;
-                        e.RelType = TypeOfRelation.Equal;
-
-                        var poly = FindPolygonOfVertex(e.V1);
-                        var success = poly.SetEqualLength(EqRelE1, e, e, 0);
-
-                        EqRelE1 = null;
-                        EqRelE2 = null;
-                        SettingEqRelMode = false;
-
-                        RefreshBitmap();
                     }
                 }
-                else if (SettingParRelMode)
+                else if (SettingParRelMode && e != null)
                 {
-                    if (ParRelE1 == null)
+                    if(RelationCounter < 6)
                     {
-                        if (e.RelType != TypeOfRelation.None)
+                        if (ParRelE1 == null)
                         {
-                            SettingParRelMode = false;
-                            return;
+                            if (e.RelType != TypeOfRelation.None)
+                            {
+                                SettingParRelMode = false;
+                                return;
+                            }
+                            ParRelE1 = e;
                         }
-                        ParRelE1 = e;
-                    }
-                    else if (ParRelE2 == null)
-                    {
-                        if(!(ParRelE1.V1.E1 != e && ParRelE1.V1.E2 != e && ParRelE1.V2.E1 != e && ParRelE1.V2.E2 != e) 
-                           || e.RelType != TypeOfRelation.None)
+                        else if (ParRelE2 == null)
                         {
+                            if (!(ParRelE1.V1.E1 != e && ParRelE1.V1.E2 != e && ParRelE1.V2.E1 != e && ParRelE1.V2.E2 != e)
+                                || e.RelType != TypeOfRelation.None)
+                            {
+                                ParRelE1 = null;
+                                SettingParRelMode = false;
+                                return;
+                            }
+
+                            var poly = FindPolygonOfVertex(e.V1);
+                            var success = poly.SetParallel(ParRelE1, e, e, 0);
+
+                            if (success)
+                            {
+                                ParRelE1.RelatedEdge = e;
+                                ParRelE1.RelType = TypeOfRelation.Parallel;
+                                e.RelatedEdge = ParRelE1;
+                                e.RelType = TypeOfRelation.Parallel;
+                            }
+
                             ParRelE1 = null;
+                            ParRelE2 = null;
                             SettingParRelMode = false;
-                            return;
+                            RelationCounter++;
+
+                            RefreshBitmap();
                         }
-                        ParRelE1.RelatedEdge = e;
-                        ParRelE1.RelType = TypeOfRelation.Parallel;
-                        e.RelatedEdge = EqRelE1;
-                        e.RelType = TypeOfRelation.Parallel;
-
-                        var poly = FindPolygonOfVertex(e.V1);
-                        var success = poly.SetParallel(ParRelE1, e, e, 0);
-
-                        ParRelE1 = null;
-                        ParRelE2 = null;
-                        SettingParRelMode = false;
-
-                        RefreshBitmap();
                     }
                 }
                 else if (PolygonMovingMode)
@@ -882,7 +917,35 @@ namespace PolygonDrawer.ViewModel
                 }
             }
 
-            //Bitmap = bitmap2;
+            int j = 0;
+
+            var Edges2 = new Edge[Edges.Count];
+            Edges.CopyTo(Edges2, 0);
+            var Edges3 = Edges2.ToList();
+
+            while(Edges3.Count > 0)
+            {
+                var e = Edges3[0];
+                if (e.RelType == TypeOfRelation.None)
+                {
+                    Edges3.RemoveAt(0);
+                    continue;
+                }
+                    
+
+
+                else if (e.RelType != TypeOfRelation.None)
+                {
+                    Drawer.DrawMark(Bitmap, e, colors[j].r, colors[j].g, colors[j].b);
+                    Drawer.DrawMark(Bitmap, e.RelatedEdge, colors[j].r, colors[j].g, colors[j].b);
+                    j++;
+                    Edges3.Remove(e.RelatedEdge);
+                    Edges3.Remove(e);
+                }
+            }
         }
+
+            //Bitmap = bitmap2;
+        
     }
 }

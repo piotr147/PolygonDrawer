@@ -11,6 +11,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System.Configuration;
 using System.Security.Cryptography.X509Certificates;
+using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using PolygonDrawer.Converters;
 using PolygonDrawer.Model;
@@ -356,6 +357,63 @@ namespace PolygonDrawer.ViewModel
             }
 
             return false;
+        }
+
+        public static bool DrawMark(WriteableBitmap bitmap, Edge e, int r, int g, int b)
+        {
+            if(e.RelType == TypeOfRelation.None)
+            {
+                return true;
+            }
+
+            if (e.RelType == TypeOfRelation.Parallel)
+            {
+                DrawParallelMark(bitmap, e, r, g, b);
+            }
+
+            if (e.RelType == TypeOfRelation.Equal)
+            {
+                DrawEqualMark(bitmap, e, r, g, b);
+            }
+            return false;
+        }
+
+        private static void DrawEqualMark(WriteableBitmap bitmap, Edge e, int r, int g, int b)
+        {
+            DrawColorVertexEq(bitmap, (e.V1.X + e.V2.X) / 2, (int)(e.V1.Y + e.V2.Y) / 2, r, g, b);
+        }
+
+        private static bool DrawParallelMark(WriteableBitmap bitmap,Edge e, int r, int g, int b)
+        {
+            DrawColorVertexPar(bitmap, (e.V1.X + e.V2.X) / 2, (int)(e.V1.Y + e.V2.Y) / 2, r, g, b);
+
+
+            return true;
+        }
+
+        private static void DrawColorVertexPar(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
+        {
+            for (int i = -4; i <= 4; i++)
+            {
+                for (int j = -4; j <= 4; j++)
+                {
+                    DrawPixel(bitmap, x + i, y + j, r, g, b);
+                }
+            }
+        }
+
+        private static void DrawColorVertexEq(WriteableBitmap bitmap, int x, int y, int r, int g, int b)
+        {
+            for (int i = -4; i <= 4; i++)
+            {
+                for (int j = -4; j <= 4; j++)
+                {
+                    if (j == 1 || j == 2 || j == 3 || j == -1 || j == -2 || j == -3)
+                        DrawPixel(bitmap, x + i, y + j, 0, 0, 0);
+                    else
+                        DrawPixel(bitmap, x + i, y + j, r, g, b);
+                }
+            }
         }
     }
 }
