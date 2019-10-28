@@ -531,29 +531,39 @@ namespace PolygonDrawer.ViewModel
 
                 var poly = FindPolygonOfVertex(CapturedVertex);
 
-                if (CapturedVertex.E1.RelType == TypeOfRelation.Equal)
+                if(CapturedVertex.E1.RelType == TypeOfRelation.Equal || CapturedVertex.E2.RelType == TypeOfRelation.Equal)
                 {
-                    poly.KeepEqualLength(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
-                    ruszyc = false;
-                }
+                    if (CapturedVertex.E1.RelType == TypeOfRelation.Equal)
+                    {
+                        poly.KeepEqualLength(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
+                        ruszyc = false;
+                    }
 
-                if (CapturedVertex.E2.RelType == TypeOfRelation.Equal)
-                {
-                    poly.KeepEqualLength(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
-                    ruszyc = false;
+                    if (CapturedVertex.E2.RelType == TypeOfRelation.Equal)
+                    {
+                        poly.KeepEqualLength(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
+                        ruszyc = false;
+                    }
                 }
+                else
+                {
+                    if (CapturedVertex.E1.RelType == TypeOfRelation.Parallel)
+                    {
+                        poly.KeepParallel(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
+                        ruszyc = false;
+                    }
 
-                if (CapturedVertex.E1.RelType == TypeOfRelation.Parallel)
-                {
-                    poly.KeepParallel(CapturedVertex.E1, CapturedVertex.E1.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E1, 0);
-                    ruszyc = false;
-                }
+                    if (CapturedVertex.E2.RelType == TypeOfRelation.Parallel)
+                    {
+                        poly.KeepParallel(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
+                        ruszyc = false;
+                    }
 
-                if (CapturedVertex.E2.RelType == TypeOfRelation.Parallel)
-                {
-                    poly.KeepParallel(CapturedVertex.E2, CapturedVertex.E2.RelatedEdge, CapturedVertex, x, y, CapturedVertex.E2, 0);
-                    ruszyc = false;
+
                 }
+                
+
+                
 
                 if (ruszyc)
                 {
@@ -601,6 +611,12 @@ namespace PolygonDrawer.ViewModel
                     ruszyc = false;
                     e1rusz = e1ok;
                 }
+                else if (e1.RelType == TypeOfRelation.Parallel)
+                {
+                    e1ok = poly.KeepParallel(e1, e1.RelatedEdge, v1, v1.X + x - CapturedPointOfEdge.X, v1.Y + y - CapturedPointOfEdge.Y, e1, 0);
+                    ruszyc = false;
+                    e1rusz = e1ok;
+                }
 
                 if (e2.RelType == TypeOfRelation.Equal)
                 {
@@ -608,23 +624,12 @@ namespace PolygonDrawer.ViewModel
                     ruszyc = false;
                     e2rusz = e2ok;
                 }
-
-                if (e1.RelType == TypeOfRelation.Parallel)
-                {
-                    e1ok = poly.KeepParallel(e1, e1.RelatedEdge, v1, v1.X + x - CapturedPointOfEdge.X, v1.Y + y - CapturedPointOfEdge.Y, e1, 0);
-                    ruszyc = false;
-                    e1rusz = e1ok;
-                }
-
-                if (e2.RelType == TypeOfRelation.Parallel)
+                else if (e2.RelType == TypeOfRelation.Parallel)
                 {
                     e2ok = poly.KeepParallel(e2, e2.RelatedEdge, v2, v2.X + x - CapturedPointOfEdge.X, v2.Y + y - CapturedPointOfEdge.Y, e2, 0);
                     ruszyc = false;
                     e2rusz = e2ok;
                 }
-
-
-
 
 
                 if (!e1ok || !e2ok)
