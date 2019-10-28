@@ -26,119 +26,29 @@ namespace PolygonDrawer.ViewModel
         public static void Bresenham(WriteableBitmap bitmap, int x1, int y1, int x2, int y2, int r = 255, int g = 0,
             int b = 0)
         {
-            int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+            int dx = Math.Abs(x2 - x1);
+            int sx = x1 < x2 ? 1 : -1;
+            int dy = Math.Abs(y2 - y1);
+            int sy = y1 < y2 ? 1 : -1;
+            int err = (dx > dy ? dx : -dy) / 2;
+            int e2;
 
-            // Calculate line deltas
-            dx = x2 - x1;
-            dy = y2 - y1;
-
-            // Create a positive copy of deltas (makes iterating easier)
-            dx1 = dx >= 0 ? dx : -dx;
-            dy1 = dy >= 0 ? dy : -dy;
-
-            // Calculate error intervals for both axis
-            px = 2 * dy1 - dx1;
-            py = 2 * dx1 - dy1;
-
-            // The line is X-axis dominant
-            if (dy1 <= dx1)
+            while(true)
             {
+                DrawPixel(bitmap, x1, y1, r, g, b);
 
-                // Line is drawn left to right
-                if (dx >= 0)
+                if (x2 == x1 && y2 == y1)
+                    return;
+                e2 = err;
+                if (e2 > -dx)
                 {
-                    x = x1;
-                    y = y1;
-                    xe = x2;
+                    err -= dy;
+                    x1 += sx;
                 }
-                else
+                if (e2 < dy)
                 {
-                    // Line is drawn right to left (swap ends)
-                    x = x2;
-                    y = y2;
-                    xe = x1;
-                }
-
-                DrawPixel(bitmap, x, y, r, g, b); // Draw first pixel
-
-                // Rasterize the line
-                for (i = 0; x < xe; i++)
-                {
-                    x = x + 1;
-
-                    // Deal with octants...
-                    if (px < 0)
-                    {
-                        px = px + 2 * dy1;
-                    }
-                    else
-                    {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
-                        {
-                            y = y + 1;
-                        }
-                        else
-                        {
-                            y = y - 1;
-                        }
-
-                        px = px + 2 * (dy1 - dx1);
-                    }
-
-                    // Draw pixel from line span at
-                    // currently rasterized position
-                    DrawPixel(bitmap, x, y, r, g, b);
-                }
-
-            }
-            else
-            {
-                // The line is Y-axis dominant
-
-                // Line is drawn bottom to top
-                if (dy >= 0)
-                {
-                    x = x1;
-                    y = y1;
-                    ye = y2;
-                }
-                else
-                {
-                    // Line is drawn top to bottom
-                    x = x2;
-                    y = y2;
-                    ye = y1;
-                }
-
-                DrawPixel(bitmap, x, y, r, g, b); // Draw first pixel
-
-                // Rasterize the line
-                for (i = 0; y < ye; i++)
-                {
-                    y = y + 1;
-
-                    // Deal with octants...
-                    if (py <= 0)
-                    {
-                        py = py + 2 * dx1;
-                    }
-                    else
-                    {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
-                        {
-                            x = x + 1;
-                        }
-                        else
-                        {
-                            x = x - 1;
-                        }
-
-                        py = py + 2 * (dx1 - dy1);
-                    }
-
-                    // Draw pixel from line span at
-                    // currently rasterized position
-                    DrawPixel(bitmap, x, y, r, g, b);
+                    err += dx;
+                    y1 += sy;
                 }
             }
         }
@@ -225,138 +135,37 @@ namespace PolygonDrawer.ViewModel
             DrawVertex(bitmap, x, y);
         }
 
-
-
-
-
-
-
-
-
-
         public static bool BresenhamBool(WriteableBitmap bitmap, int x1, int y1, int x2, int y2, int xs, int ys)
         {
-            int x, y, dx, dy, dx1, dy1, px, py, xe, ye, i;
+            int dx = Math.Abs(x2 - x1);
+            int sx = x1 < x2 ? 1 : -1;
+            int dy = Math.Abs(y2 - y1);
+            int sy = y1 < y2 ? 1 : -1;
+            int err = (dx > dy ? dx : -dy) / 2;
+            int e2;
 
-            // Calculate line deltas
-            dx = x2 - x1;
-            dy = y2 - y1;
-
-            // Create a positive copy of deltas (makes iterating easier)
-            dx1 = dx >= 0 ? dx : -dx;
-            dy1 = dy >= 0 ? dy : -dy;
-
-            // Calculate error intervals for both axis
-            px = 2 * dy1 - dx1;
-            py = 2 * dx1 - dy1;
-
-            // The line is X-axis dominant
-            if (dy1 <= dx1)
+            while (true)
             {
-
-                // Line is drawn left to right
-                if (dx >= 0)
-                {
-                    x = x1;
-                    y = y1;
-                    xe = x2;
-                }
-                else
-                {
-                    // Line is drawn right to left (swap ends)
-                    x = x2;
-                    y = y2;
-                    xe = x1;
-                }
-
-                if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
+                //DrawPixel(bitmap, x1, y1, r, g, b);
+                if (xs > x1 - 3 && xs < x1 + 3 && ys > y1 - 3 && ys < y1 + 3)
                     return true;
 
-                // Rasterize the line
-                for (i = 0; x < xe; i++)
+                if (x2 == x1 && y2 == y1)
+                    return false;
+                e2 = err;
+                if (e2 > -dx)
                 {
-                    x = x + 1;
-
-                    // Deal with octants...
-                    if (px < 0)
-                    {
-                        px = px + 2 * dy1;
-                    }
-                    else
-                    {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
-                        {
-                            y = y + 1;
-                        }
-                        else
-                        {
-                            y = y - 1;
-                        }
-
-                        px = px + 2 * (dy1 - dx1);
-                    }
-
-                    // Draw pixel from line span at
-                    // currently rasterized position
-                    if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
-                        return true;
+                    err -= dy;
+                    x1 += sx;
                 }
-
-            }
-            else
-            {
-                // The line is Y-axis dominant
-
-                // Line is drawn bottom to top
-                if (dy >= 0)
+                if (e2 < dy)
                 {
-                    x = x1;
-                    y = y1;
-                    ye = y2;
-                }
-                else
-                {
-                    // Line is drawn top to bottom
-                    x = x2;
-                    y = y2;
-                    ye = y1;
-                }
-
-                if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
-                    return true;
-
-                // Rasterize the line
-                for (i = 0; y < ye; i++)
-                {
-                    y = y + 1;
-
-                    // Deal with octants...
-                    if (py <= 0)
-                    {
-                        py = py + 2 * dx1;
-                    }
-                    else
-                    {
-                        if ((dx < 0 && dy < 0) || (dx > 0 && dy > 0))
-                        {
-                            x = x + 1;
-                        }
-                        else
-                        {
-                            x = x - 1;
-                        }
-
-                        py = py + 2 * (dx1 - dy1);
-                    }
-
-                    // Draw pixel from line span at
-                    // currently rasterized position
-                    if (x <= xs + 3 && x >= xs - 3 && y <= ys + 3 && y >= ys - 3)
-                        return true;
+                    err += dx;
+                    y1 += sy;
                 }
             }
 
-            return false;
+            //return false;
         }
 
         public static bool DrawMark(WriteableBitmap bitmap, Edge e, int r, int g, int b)
