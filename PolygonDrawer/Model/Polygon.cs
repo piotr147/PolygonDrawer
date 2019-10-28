@@ -53,8 +53,8 @@ namespace PolygonDrawer.Model
 
             var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
 
-            if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, circles))
-                return false;
+            //if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, 0))
+            //    return false;
 
             var wantedLength = relE.Length;
             var currentLength = movE.Length;
@@ -208,8 +208,8 @@ namespace PolygonDrawer.Model
 
             var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
 
-            if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, circles))
-                return false;
+            //if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, 0))
+            //    return false;
 
             var anV = movE.V1 != movV ? movE.V1 : movE.V2;
 
