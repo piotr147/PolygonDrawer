@@ -76,6 +76,11 @@
             </Button>
             <TextBlock Text="{Binding SettingParRelMode}">
             </TextBlock>
+            <Button Name="RemoveRelationButton" Content="Remove Relation" Command="{Binding RemoveRelation}"
+                    IsEnabled="{Binding RemoveRelationButtonEnabled}">
+            </Button>
+            <TextBlock Text="{Binding RemoveRelationMode}">
+            </TextBlock>
             <Button Name="ClearButton" Content="Clear" Command="{Binding ClearBitmap}">
             </Button>
         </StackPanel>

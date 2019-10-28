@@ -63,6 +63,11 @@ namespace PolygonDrawer.ViewModel
             Bresenham(bitmap, e.V1.X, e.V1.Y, e.V2.X, e.V2.Y);
         }
 
+        public static void DrawEdge(WriteableBitmap bitmap, Edge e, int r, int g, int b)
+        {
+            Bresenham(bitmap, e.V1.X, e.V1.Y, e.V2.X, e.V2.Y, r, g, b);
+        }
+
         public static void DrawEdge(WriteableBitmap bitmap, Vertex v1, Vertex v2)
         {
             Bresenham(bitmap, v1.X, v1.Y,v2.X, v2.Y);
