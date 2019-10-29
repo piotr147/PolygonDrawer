@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 
 namespace PolygonDrawer.Model
@@ -34,6 +35,8 @@ namespace PolygonDrawer.Model
 
         public bool KeepEqualLength(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles, int count)
         {
+            var secVert = movV != movE.V1 ? movE.V1 : movE.V2;
+
             var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
 
             if (count > 3 * this.Vertices.Count)
@@ -46,6 +49,29 @@ namespace PolygonDrawer.Model
             }
             if (movE == startEdge && circles == 0)
                 circles++;
+
+            if (relE.V1.IsFixed && relE.V2.IsFixed)
+            {
+                if (Length(xTo, yTo, secVert.X, secVert.Y) == relE.Length)
+                {
+                    if (CanBeSet(movE, movV, xTo, yTo, startEdge, circles, count))
+                    {
+                        movV.X = xTo;
+                        movV.Y = yTo;
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    {
+                        return false;
+                    }
+                }
+            }
 
             if (secEdgeOfMovV.RelType == TypeOfRelation.Parallel)
             {
@@ -211,6 +237,8 @@ namespace PolygonDrawer.Model
 
         public bool KeepParallel(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles, int count)
         {
+            var secVert = movE.V1 != movV ? movE.V1 : movE.V2;
+
             if (count > 3 * this.Vertices.Count)
                 return false;
             count++; 
@@ -224,6 +252,39 @@ namespace PolygonDrawer.Model
             }
             if (movE == startEdge && circles == 0)
                 circles++;
+
+            if (relE.V1.IsFixed && relE.V2.IsFixed)
+            {
+                bool isStillParallel = false;
+
+                var x = secVert.X + (int) ((double) (yTo - secVert.Y) /
+                                           Tan(relE.V1.X, relE.V1.Y, relE.V2.X, relE.V2.Y));
+                if (x == xTo)
+                {
+                    if(CanBeSet(movE, movV, xTo, yTo, startEdge, circles, count))
+                    {
+                        isStillParallel = true;
+                        movV.X = xTo;
+                        movV.Y = yTo;
+                        return true;
+                    }
+                }
+
+                var y = secVert.Y + (int)((double)(xTo - secVert.X) *
+                                          Tan(relE.V1.X, relE.V1.Y, relE.V2.X, relE.V2.Y));
+                if(y == yTo)
+                {
+                    if (CanBeSet(movE, movV, xTo, yTo, startEdge, circles, count))
+                    {
+                        isStillParallel = true;
+                        movV.X = xTo;
+                        movV.Y = yTo;
+                        return true;
+                    }
+                }
+
+                return false;
+            }
 
             movV.X = xTo;
             movV.Y = yTo;
