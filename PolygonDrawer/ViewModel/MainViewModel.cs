@@ -930,25 +930,6 @@ namespace PolygonDrawer.ViewModel
                     if (CheckIfOnExistingVertex(x, y))
                     {
                         SelectedVertex = FindCapturedVertex(x, y);
-
-                        if (FindPolygonOfVertex(SelectedVertex).Vertices.Count < 4)
-                        {
-                            if(SelectedVertex.E1.RelType != TypeOfRelation.None)
-                            {
-                                SelectedVertex.E1.RelType = TypeOfRelation.None;
-                                SelectedVertex.E1.RelatedEdge.RelType = TypeOfRelation.None;
-                            }
-                            if (SelectedVertex.E2.RelType != TypeOfRelation.None)
-                            {
-                                SelectedVertex.E2.RelType = TypeOfRelation.None;
-                                SelectedVertex.E2.RelatedEdge.RelType = TypeOfRelation.None;
-                            }
-
-                            SelectedVertex = null;
-                            DeleteVertexNextMove = false;
-                            return;
-                        }
-
                         DeleteSelectedVertex(SelectedVertex);
                         SelectedVertex = null;
 
@@ -959,51 +940,9 @@ namespace PolygonDrawer.ViewModel
                 }
                 else if (AddVertexNextMove)
                 {
-                    
-
                     if (e != null)// && e.RelType == TypeOfRelation.None)
                     {
-                        if (e.RelType != TypeOfRelation.None)
-                        {
-                            e.RelType = TypeOfRelation.None;
-                            e.RelatedEdge.RelType = TypeOfRelation.None;
-                            e.RelatedEdge.RelatedEdge = null;
-                            e.RelatedEdge = null;
-                        }
-                        var poly = FindPolygonOfVertex(e.V1);
-                        var v1 = e.V1;
-                        var v2 = e.V2;
-                        var index = poly.Vertices.IndexOf(e.V1) < poly.Vertices.IndexOf(e.V2) ?
-                            poly.Vertices.IndexOf(e.V1) : poly.Vertices.IndexOf(e.V2);
-                        if (poly.Vertices.IndexOf(v1) == 0 && poly.Vertices.IndexOf(v2) == poly.Vertices.Count - 1)
-                        {
-                            index = poly.Vertices.IndexOf(v2);
-                        }
-
-                        if (poly.Vertices.IndexOf(v2) == 0 && poly.Vertices.IndexOf(v1) == poly.Vertices.Count - 1)
-                        {
-                            index = poly.Vertices.IndexOf(v1);
-                        }
-
-                        var vnew = new Vertex((v1.X + v2.X) / 2, (v1.Y + v2.Y) / 2);
-
-                        poly.Vertices.Insert(index + 1, vnew);
-                        Vertices.Add(vnew);
-                        Edges.Remove(e);
-                        poly.Edges.Remove(e);
-
-                        var e1 = new Edge(v1, vnew);
-                        var e2 = new Edge(v2, vnew);
-
-                        vnew.AddEdge(e1);
-                        vnew.AddEdge(e2);
-
-                        Edges.Add(e1);
-                        Edges.Add(e2);
-                        poly.Edges.Add(e1);
-                        poly.Edges.Add(e2);
-
-
+                        AddNewVertex(e);
                         RefreshBitmap();
                     }
 
@@ -1013,24 +952,65 @@ namespace PolygonDrawer.ViewModel
                 {
                     if(e != null)
                     {
-                        if(e.RelType != TypeOfRelation.None)
-                        {
-                            e.RelatedEdge.RelatedEdge = null;
-                            e.RelatedEdge.RelType = TypeOfRelation.None;
-                            e.RelType = TypeOfRelation.None;
-                            e.RelatedEdge = null;
-                        }
+                        RemoveRelationIfPresent(e);
                     }
                     RemoveRelationMode = false;
                     RefreshBitmap();
                 }
             }
-            
+        }
 
+        private void AddNewVertex(Edge e)
+        {
+            RemoveRelationIfPresent(e);
+
+            var poly = FindPolygonOfVertex(e.V1);
+            var v1 = e.V1;
+            var v2 = e.V2;
+            var index = poly.Vertices.IndexOf(e.V1) < poly.Vertices.IndexOf(e.V2) ?
+                poly.Vertices.IndexOf(e.V1) : poly.Vertices.IndexOf(e.V2);
+            if (poly.Vertices.IndexOf(v1) == 0 && poly.Vertices.IndexOf(v2) == poly.Vertices.Count - 1)
+            {
+                index = poly.Vertices.IndexOf(v2);
+            }
+
+            if (poly.Vertices.IndexOf(v2) == 0 && poly.Vertices.IndexOf(v1) == poly.Vertices.Count - 1)
+            {
+                index = poly.Vertices.IndexOf(v1);
+            }
+
+            var vnew = new Vertex((v1.X + v2.X) / 2, (v1.Y + v2.Y) / 2);
+
+            poly.Vertices.Insert(index + 1, vnew);
+            Vertices.Add(vnew);
+            Edges.Remove(e);
+            poly.Edges.Remove(e);
+
+            var e1 = new Edge(v1, vnew);
+            var e2 = new Edge(v2, vnew);
+
+            vnew.AddEdge(e1);
+            vnew.AddEdge(e2);
+
+            Edges.Add(e1);
+            Edges.Add(e2);
+            poly.Edges.Add(e1);
+            poly.Edges.Add(e2);
         }
 
         private void DeleteSelectedVertex(Vertex selectedVertex)
         {
+            if (FindPolygonOfVertex(SelectedVertex).Vertices.Count < 4)
+            {
+
+                RemoveRelationIfPresent(SelectedVertex.E1);
+                RemoveRelationIfPresent(SelectedVertex.E2);
+
+                SelectedVertex = null;
+                DeleteVertexNextMove = false;
+                return;
+            }
+
             var v1 = SelectedVertex.E1.V1 == selectedVertex ? SelectedVertex.E1.V2 : SelectedVertex.E1.V1;
             var v2 = SelectedVertex.E2.V1 == selectedVertex ? SelectedVertex.E2.V2 : SelectedVertex.E1.V1;
 
@@ -1039,21 +1019,9 @@ namespace PolygonDrawer.ViewModel
 
             var p = FindPolygonOfVertex(selectedVertex);
 
-            if (selectedVertex.E1.RelType != TypeOfRelation.None)
-            {
-                selectedVertex.E1.RelType = TypeOfRelation.None;
-                selectedVertex.E1.RelatedEdge.RelType = TypeOfRelation.None;
-                selectedVertex.E1.RelatedEdge.RelatedEdge = null;
-                selectedVertex.E1.RelatedEdge = null;
-            }
+            RemoveRelationIfPresent(SelectedVertex.E1);
 
-            if (selectedVertex.E2.RelType != TypeOfRelation.None)
-            {
-                selectedVertex.E2.RelType = TypeOfRelation.None;
-                selectedVertex.E2.RelatedEdge.RelType = TypeOfRelation.None;
-                selectedVertex.E2.RelatedEdge.RelatedEdge = null;
-                selectedVertex.E2.RelatedEdge = null;
-            }
+            RemoveRelationIfPresent(SelectedVertex.E2);
 
             var e = new Edge(v1, v2);
             v1.AddEdge(e);
@@ -1141,11 +1109,15 @@ namespace PolygonDrawer.ViewModel
             return null;
         }
 
-        private bool IsVertexInsideBitmap()
+        private void RemoveRelationIfPresent(Edge e)
         {
-
-
-            return true;
+            if (e.RelType != TypeOfRelation.None)
+            {
+                e.RelType = TypeOfRelation.None;
+                e.RelatedEdge.RelType = TypeOfRelation.None;
+                e.RelatedEdge.RelatedEdge = null;
+                e.RelatedEdge = null;
+            }
         }
 
         public void RefreshBitmap()

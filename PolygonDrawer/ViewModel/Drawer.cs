@@ -1,19 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
-using System.Windows.Media;
-using System.Windows.Input;
-using GalaSoft.MvvmLight;
-using GalaSoft.MvvmLight.Command;
-using System.Configuration;
-using System.Security.Cryptography.X509Certificates;
-using System.Windows.Controls;
-using System.Windows.Media.Animation;
-using PolygonDrawer.Converters;
+
 using PolygonDrawer.Model;
 
 
@@ -21,7 +9,6 @@ namespace PolygonDrawer.ViewModel
 {
     public static class Drawer
     {
-
 
         public static void Bresenham(WriteableBitmap bitmap, int x1, int y1, int x2, int y2, int r = 255, int g = 0,
             int b = 0)
