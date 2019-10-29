@@ -76,6 +76,11 @@
             </Button>
             <TextBlock Text="{Binding SettingParRelMode}">
             </TextBlock>
+            <Button Name="SetVertexFixed" Content="Change vertex fixed" Command="{Binding SetVertexFixed}"
+                    IsEnabled="{Binding SetVertexFixedButtonEnabled}">
+            </Button>
+            <TextBlock Text="{Binding SettingVertexFixedMode}">
+            </TextBlock>
             <Button Name="RemoveRelationButton" Content="Remove Relation" Command="{Binding RemoveRelation}"
                     IsEnabled="{Binding RemoveRelationButtonEnabled}">
             </Button>

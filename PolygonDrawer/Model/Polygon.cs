@@ -406,6 +406,11 @@ namespace PolygonDrawer.Model
 
         public bool CanBeSet(Edge e, Vertex v2, int x, int y, Edge startEdge, int circles, int count)
         {
+            if (v2.IsFixed)
+            {
+                return false;
+            }
+
             var secEdge = v2.E1 != e ? v2.E1 : v2.E2;
             if (circles > 0 && secEdge == startEdge)
             {

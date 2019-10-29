@@ -40,10 +40,6 @@ namespace PolygonDrawer.ViewModel
             }
         }
 
-        public static void EraseEdge(WriteableBitmap bitmap, Edge e)
-        {
-            Bresenham(bitmap, e.V1.X, e.V1.Y, e.V2.X, e.V2.Y, 0, 0, 0);
-        }
 
         public static void DrawEdge(WriteableBitmap bitmap, Edge e)
         {
@@ -76,55 +72,34 @@ namespace PolygonDrawer.ViewModel
 
         public static void DrawVertex(WriteableBitmap bitmap, Vertex v)
         {
-            for (int i = -2; i <= 2; i++)
+            if (!v.IsFixed)
             {
-                for (int j = -2; j <= 2; j++)
+                for (int i = -2; i <= 2; i++)
                 {
-                    DrawPixel(bitmap, v.X + i, v.Y + j);
+                    for (int j = -2; j <= 2; j++)
+                    {
+                        DrawPixel(bitmap, v.X + i, v.Y + j);
+                    }
                 }
-            }
-        }
-
-        public static void DrawVertex(WriteableBitmap bitmap, int x, int y)
-        {
-            for (int i = -2; i <= 2; i++)
-            {
-                for (int j = -2; j <= 2; j++)
-                {
-                    DrawPixel(bitmap, x + i, y + j);
-                }
-            }
-        }
-
-        public static void EraseVertex(WriteableBitmap bitmap, Vertex v)
-        {
-            for (int i = -2; i <= 2; i++)
-            {
-                for (int j = -2; j <= 2; j++)
-                {
-                    DrawPixel(bitmap, v.X + i, v.Y + j, 0, 0, 0);
-                }
-            }
-        }
-
-        public static void EdgeOneSideMoving(WriteableBitmap bitmap, Edge e, int x1, int y1, int x2, int y2)
-        {
-            if (e.V1.X == x1 && e.V1.Y == y1)
-            {
-                Bresenham(bitmap, e.V2.X, e.V2.Y, x1, y1, 0, 0, 0);
-                Bresenham(bitmap, e.V2.X, e.V2.Y, x2, y2);
             }
             else
             {
-                Bresenham(bitmap, e.V1.X, e.V1.Y, x1, y1, 0, 0, 0);
-                Bresenham(bitmap, e.V1.X, e.V1.Y, x2, y2);
+                for (int i = -4; i <= 4; i++)
+                {
+                    for (int j = -4; j <= 4; j++)
+                    {
+                        if (Math.Abs(i) == Math.Abs(j) || Math.Abs(i - 1) == Math.Abs(j) || Math.Abs(i) == Math.Abs(j - 1)
+                            || Math.Abs(i + 1) == Math.Abs(j) || Math.Abs(i) == Math.Abs(j + 1))
+                        {
+                            DrawPixel(bitmap, v.X + i, v.Y + j, 0, 0, 0);
+                        }
+                        else
+                        {
+                            DrawPixel(bitmap, v.X + i, v.Y + j, 255, 255, 255);
+                        }
+                    }
+                }
             }
-        }
-
-        public static void VertexMoving(WriteableBitmap bitmap, Vertex v, int x, int y)
-        {
-            EraseVertex(bitmap, v);
-            DrawVertex(bitmap, x, y);
         }
 
         public static bool BresenhamBool(WriteableBitmap bitmap, int x1, int y1, int x2, int y2, int xs, int ys)

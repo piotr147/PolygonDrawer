@@ -77,6 +77,7 @@ namespace PolygonDrawer.ViewModel
         private Edge _parRelE2;
         private int _relationCounter;
         private bool _removeRelationMode;
+        private bool _settingVertexFixedMode;
 
         public int RelationCounter
         {
@@ -141,13 +142,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _removeRelationMode; }
             set { _removeRelationMode = value; RaisePropertyChanged(nameof(RemoveRelationMode));
-                RaisePropertyChanged(nameof(SettingParRelMode));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -155,12 +150,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _isMovingModeOn; }
             set { _isMovingModeOn = value; RaisePropertyChanged(nameof(IsMovingModeOn));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -168,13 +158,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _isVertexMoving; }
             set { _isVertexMoving = value; RaisePropertyChanged(nameof(IsVertexMoving));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -182,13 +166,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _isEdgeMoving; }
             set { _isEdgeMoving = value; RaisePropertyChanged(nameof(IsEdgeMoving));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -196,12 +174,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _isPolygonMoving; }
             set { _isPolygonMoving = value; RaisePropertyChanged(nameof(IsPolygonMoving));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -209,12 +182,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _polygonMovingMode; }
             set { _polygonMovingMode = value; RaisePropertyChanged(nameof(PolygonMovingMode));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -222,12 +190,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _settingEqRelMode; }
             set { _settingEqRelMode = value; RaisePropertyChanged(nameof(SettingEqRelMode));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -235,12 +198,15 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _settingParRelMode; }
             set { _settingParRelMode = value; RaisePropertyChanged(nameof(SettingParRelMode));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
+            }
+        }
+
+        public bool SettingVertexFixedMode
+        {
+            get { return _settingVertexFixedMode; }
+            set { _settingVertexFixedMode = value; RaisePropertyChanged(nameof(SettingVertexFixedMode));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -248,12 +214,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _deleteVertexNextMove; }
             set { _deleteVertexNextMove = value; RaisePropertyChanged(nameof(DeleteVertexNextMove));
-                RaisePropertyChanged(nameof(AddVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -261,12 +222,7 @@ namespace PolygonDrawer.ViewModel
         {
             get { return _addVertexNextMove; }
             set { _addVertexNextMove = value; RaisePropertyChanged(nameof(AddVertexNextMove));
-                RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
-                RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
-                RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
-                RaisePropertyChanged(nameof(SetParallelButtonEnabled));
-                RaisePropertyChanged(nameof(ModeButtonEnabled));
-                RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+                RaiseEnabledPropertiesChanged();
             }
         }
 
@@ -396,12 +352,18 @@ namespace PolygonDrawer.ViewModel
             private set;
         }
 
+        public RelayCommand SetVertexFixed
+        {
+            get;
+            private set;
+        }
+
         public bool DeleteVertexButtonEnabled
         {
             get
             {
                 return IsMovingModeOn && !PolygonMovingMode && !SettingEqRelMode && !SettingParRelMode && !AddVertexNextMove
-                    && !IsEdgeMoving && !IsVertexMoving && !IsPolygonMoving && !RemoveRelationMode;
+                    && !IsEdgeMoving && !IsVertexMoving && !IsPolygonMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -410,7 +372,7 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return IsMovingModeOn && !PolygonMovingMode && !SettingEqRelMode && !SettingParRelMode && !DeleteVertexNextMove
-                    && !IsEdgeMoving && !IsVertexMoving && !IsPolygonMoving && !RemoveRelationMode;
+                    && !IsEdgeMoving && !IsVertexMoving && !IsPolygonMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -419,7 +381,7 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return IsMovingModeOn && !AddVertexNextMove && !SettingEqRelMode && !SettingParRelMode && !DeleteVertexNextMove
-                  && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode;
+                  && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -428,7 +390,7 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return IsMovingModeOn && !AddVertexNextMove && !PolygonMovingMode && !IsPolygonMoving && !SettingParRelMode 
-                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode;
+                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -437,7 +399,7 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return IsMovingModeOn && !AddVertexNextMove && !PolygonMovingMode && !IsPolygonMoving && !SettingEqRelMode
-                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode;
+                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -446,7 +408,7 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return LastVertex == null && !IsPolygonMoving && !PolygonMovingMode && !SettingEqRelMode && !SettingParRelMode
-                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode;
+                    && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !RemoveRelationMode && !SettingVertexFixedMode;
             }
         }
 
@@ -455,7 +417,18 @@ namespace PolygonDrawer.ViewModel
             get
             {
                 return IsMovingModeOn && !AddVertexNextMove && !PolygonMovingMode && !IsPolygonMoving && !SettingEqRelMode
-                    && !SettingParRelMode && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving;
+                    && !SettingParRelMode && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving && !SettingVertexFixedMode;
+            }
+        }
+
+        public bool SetVertexFixedButtonEnabled
+        {
+            get
+            {
+                return IsMovingModeOn && !AddVertexNextMove && !PolygonMovingMode && !IsPolygonMoving &&
+                       !SettingEqRelMode
+                       && !SettingParRelMode && !DeleteVertexNextMove && !IsEdgeMoving && !IsVertexMoving &&
+                       !RemoveRelationMode;
             }
         }
 
@@ -499,6 +472,7 @@ namespace PolygonDrawer.ViewModel
             MovePolygon = new RelayCommand(() => { PolygonMovingMode = !PolygonMovingMode; });
             SetEqRelation = new RelayCommand(() => { SettingEqRelMode = !SettingEqRelMode; });
             SetParRelation = new RelayCommand(() => { SettingParRelMode = !SettingParRelMode; });
+            SetVertexFixed = new RelayCommand(() => { SettingVertexFixedMode = !SettingVertexFixedMode;});
             RemoveRelation = new RelayCommand(() => { RemoveRelationMode = !RemoveRelationMode; });
             ClearBitmap = new RelayCommand(() =>
             {
@@ -889,29 +863,47 @@ namespace PolygonDrawer.ViewModel
                         {
                             var v = FindCapturedVertex(x, y);
                             CapturedPolygon = FindPolygonOfVertex(v);
+                            if (AnyVertexFixed(CapturedPolygon))
+                            {
+                                return;
+                            }
                             CapturedPointOfPoly = (x, y);
+                            IsPolygonMoving = true;
                         }
                         else if (e != null)
                         {
                             CapturedPolygon = FindPolygonOfVertex(e.V1);
+                            if (AnyVertexFixed(CapturedPolygon))
+                            {
+                                return;
+                            }
                             CapturedPointOfPoly = (x, y);
+                            IsPolygonMoving = true;
                         }
-
-                        IsPolygonMoving = true;
                     }
                     else if(IsPolygonMoving)
                     {
                         IsPolygonMoving = false;
                     }
                 }
-                else if (CheckIfOnExistingVertex(x, y) && !IsVertexMoving && !DeleteVertexNextMove && !AddVertexNextMove && !RemoveRelationMode)
+                else if (CheckIfOnExistingVertex(x, y) && !SettingVertexFixedMode && !IsVertexMoving && !DeleteVertexNextMove && !AddVertexNextMove && !RemoveRelationMode)
                 {
-                    IsVertexMoving = true;
                     CapturedVertex = FindCapturedVertex(x, y);
+                    if (CapturedVertex.IsFixed)
+                    {
+                        CapturedVertex = null;
+                        return;
+                    }
+                    IsVertexMoving = true;
                 }
-                else if (e != null && !IsEdgeMoving && !IsVertexMoving && !AddVertexNextMove && !DeleteVertexNextMove && !RemoveRelationMode)
+                else if (e != null && !SettingVertexFixedMode && !IsEdgeMoving && !IsVertexMoving && !AddVertexNextMove && !DeleteVertexNextMove && !RemoveRelationMode)
                 {
                     CapturedEdge = e;
+                    if (e.V1.IsFixed || e.V2.IsFixed)
+                    {
+                        CapturedEdge = null;
+                        return;
+                    }
                     IsEdgeMoving = true;
                     CapturedPointOfEdge = (x, y);
                 }
@@ -947,6 +939,16 @@ namespace PolygonDrawer.ViewModel
                     }
 
                     AddVertexNextMove = false;
+                }
+                else if (SettingVertexFixedMode)
+                {
+                    if (CheckIfOnExistingVertex(x, y))
+                    {
+                        var v = FindCapturedVertex(x, y);
+                        v.IsFixed = !v.IsFixed;
+                        SettingVertexFixedMode = false;
+                        RefreshBitmap();
+                    }
                 }
                 else if(RemoveRelationMode)
                 {
@@ -1109,6 +1111,17 @@ namespace PolygonDrawer.ViewModel
             return null;
         }
 
+        private bool AnyVertexFixed(Polygon poly)
+        {
+            foreach (var v in poly.Vertices)
+            {
+                if (v.IsFixed)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void RemoveRelationIfPresent(Edge e)
         {
             if (e.RelType != TypeOfRelation.None)
@@ -1118,6 +1131,18 @@ namespace PolygonDrawer.ViewModel
                 e.RelatedEdge.RelatedEdge = null;
                 e.RelatedEdge = null;
             }
+        }
+
+        private void RaiseEnabledPropertiesChanged()
+        {
+            RaisePropertyChanged(nameof(DeleteVertexButtonEnabled));
+            RaisePropertyChanged(nameof(AddVertexButtonEnabled));
+            RaisePropertyChanged(nameof(MovePolygonButtonEnabled));
+            RaisePropertyChanged(nameof(SetEqualLengthButtonEnabled));
+            RaisePropertyChanged(nameof(SetParallelButtonEnabled));
+            RaisePropertyChanged(nameof(ModeButtonEnabled));
+            RaisePropertyChanged(nameof(RemoveRelationButtonEnabled));
+            RaisePropertyChanged(nameof(SetVertexFixedButtonEnabled));
         }
 
         public void RefreshBitmap()
@@ -1154,9 +1179,6 @@ namespace PolygonDrawer.ViewModel
                     Edges3.RemoveAt(0);
                     continue;
                 }
-                    
-
-
                 else if (e.RelType != TypeOfRelation.None)
                 {
                     Drawer.DrawMark(Bitmap, e, colors[j].r, colors[j].g, colors[j].b);
