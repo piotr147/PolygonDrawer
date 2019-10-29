@@ -39,24 +39,28 @@ namespace PolygonDrawer.Model
             this.Edges = new ObservableCollection<Edge>(edges);
         }
 
-        public bool KeepEqualLength(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles)
+        public bool KeepEqualLength(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles, int count)
         {
             var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
 
-            if(secEdgeOfMovV.RelType == TypeOfRelation.Parallel)
-            {
-                if (!KeepParallel(secEdgeOfMovV, secEdgeOfMovV.RelatedEdge, movV, xTo, yTo, startEdge, circles))
-                    return false;
-            }
+            if (count > 3 * this.Vertices.Count)
+                return false;
+            count++;
 
             //if (movV.X == xTo && movV.Y == yTo)
             //    return false;
-            if (circles > 0 && movE == startEdge)
+            if ((circles > 0 && movE == startEdge) || circles >= 2)
             {
                 return false;
             }
             if (movE == startEdge && circles == 0)
                 circles++;
+
+            if (secEdgeOfMovV.RelType == TypeOfRelation.Parallel)
+            {
+                if (!KeepParallel(secEdgeOfMovV, secEdgeOfMovV.RelatedEdge, movV, xTo, yTo, startEdge, circles, count))
+                    return false;
+            }
 
             var oldX = movV.X;
             var oldY = movV.Y;
@@ -79,7 +83,7 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if(CanBeSet(relE, v1, x, y, startEdge, circles))
+                if(CanBeSet(relE, v1, x, y, startEdge, circles, count))
                 {
                     v1.X = x;
                     v1.Y = y;
@@ -97,7 +101,7 @@ namespace PolygonDrawer.Model
 
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
-                if (CanBeSet(relE, v1, x, y, startEdge, circles))
+                if (CanBeSet(relE, v1, x, y, startEdge, circles, count))
                 {
                     v1.X = x;
                     v1.Y = y;
@@ -112,52 +116,12 @@ namespace PolygonDrawer.Model
         }
 
 
-        public bool KeepEqualLength22(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles)
+        public bool SetEqualLength(Edge e1, Edge e2, Edge startEdge, int circles, int count)
         {
-            if(movV.X == xTo && movV.Y == yTo)
+            if (count > 3 * this.Vertices.Count)
                 return false;
-            if (circles > 0 && movE == startEdge)
-            {
-                return false;
-            }
-            if (movE == startEdge && circles == 0)
-                circles++;
+            count++;
 
-            var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
-
-            //if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, 0))
-            //    return false;
-
-            var wantedLength = relE.Length;
-            var currentLength = movE.Length;
-            var anV = movV != movE.V1 ? movE.V1 : movE.V2;
-
-            var x = anV.X;
-            var y = anV.Y;
-
-            x = xTo + (int) ((double) (x - xTo) * (double) wantedLength / (double) currentLength);
-            y = yTo + (int) ((double) (y - yTo) * (double) wantedLength / (double) currentLength);
-
-            if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
-            {
-                //if (true) //can be changed
-                //if(CanBeSet(movE, anV, x, y, startEdge, circles) 
-                //   && CanBeSet(movE, movV, xTo, yTo, startEdge, circles))
-                if(CanBeSet(movE, anV, x, y, startEdge, circles))
-                {
-                    anV.X = x;
-                    anV.Y = y;
-                    movV.X = xTo;
-                    movV.Y = yTo;
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public bool SetEqualLength(Edge e1, Edge e2, Edge startEdge, int circles)
-        {
             if (circles > 0 && e2 == startEdge)
             {
                 return false;
@@ -184,7 +148,7 @@ namespace PolygonDrawer.Model
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
                 //if (true) //can be changed
-                if(CanBeSet(e2, v2, x, y, startEdge, circles))
+                if(CanBeSet(e2, v2, x, y, startEdge, circles, count))
                 {
                     //if ((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2))
                     if (!((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2)))
@@ -204,7 +168,7 @@ namespace PolygonDrawer.Model
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
                 //if (true) //can be changed
-                if(CanBeSet(e2, v1, x, y, startEdge, circles))
+                if(CanBeSet(e2, v1, x, y, startEdge, circles, count))
                 {
                     //if ((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2))
                     if (!((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2)))
@@ -230,7 +194,7 @@ namespace PolygonDrawer.Model
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
                 //if (true) //can be changed
-                if(CanBeSet(e1, v2, x, y, startEdge, circles))
+                if(CanBeSet(e1, v2, x, y, startEdge, circles, count))
                 {
                     //if ((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2))
                     if (!((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2)))
@@ -250,7 +214,7 @@ namespace PolygonDrawer.Model
             if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
             {
                 //if (true) //can be changed
-                if(CanBeSet(e1, v1, x, y, startEdge, circles))
+                if(CanBeSet(e1, v1, x, y, startEdge, circles, count))
                 {
                     //if ((v2.E1 == e1 && v2.E2 == e2) || (v2.E2 == e1 && v2.E1 == e2))
                     if(!((v1.E1 == e1 && v1.E2 == e2) || (v1.E2 == e1 && v1.E1 == e2)))
@@ -267,12 +231,16 @@ namespace PolygonDrawer.Model
         }
 
 
-        public bool KeepParallel(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles)
+        public bool KeepParallel(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles, int count)
         {
+            if (count > 3 * this.Vertices.Count)
+                return false;
+            count++; 
+
             var oldX = movV.X;
             var oldY = movV.Y;
 
-            if (circles > 0 && movE == startEdge)
+            if ((circles > 0 && movE == startEdge) || circles >= 2)
             {
                 return false;
             }
@@ -296,7 +264,7 @@ namespace PolygonDrawer.Model
                 if (x > 4 && x < width - 4)
                 {
                     //if (true) //can be moved
-                    if (CanBeSet(relE, v1, x, v1.Y, startEdge, circles))
+                    if (CanBeSet(relE, v1, x, v1.Y, startEdge, circles, count))
                     {
                         v1.X = x;
                         return true;
@@ -309,7 +277,7 @@ namespace PolygonDrawer.Model
                 if (y > 4 && y < height - 4)
                 {
                     //if(true) //can be moved
-                    if (CanBeSet(relE, v1, v1.X, y, startEdge, circles))
+                    if (CanBeSet(relE, v1, v1.X, y, startEdge, circles, count))
                     {
                         v1.Y = y;
                         return true;
@@ -327,7 +295,7 @@ namespace PolygonDrawer.Model
                 if (x > 4 && x < width - 4)
                 {
                     //if (true) //can be moved
-                    if (CanBeSet(relE, v1, x, v1.Y, startEdge, circles))
+                    if (CanBeSet(relE, v1, x, v1.Y, startEdge, circles, count))
                     {
                         v1.X = x;
                         return true;
@@ -340,7 +308,7 @@ namespace PolygonDrawer.Model
                 if (y > 4 && y < height - 4)
                 {
                     //if (true) //can be moved
-                    if (CanBeSet(relE, v1, v1.X, y, startEdge, circles))
+                    if (CanBeSet(relE, v1, v1.X, y, startEdge, circles, count))
                     {
                         v1.Y = y;
                         return true;
@@ -350,14 +318,14 @@ namespace PolygonDrawer.Model
             else // x != x
             {
                 //if (true) //can be moved
-                if (CanBeSet(relE, relE.V1, relE.V2.X, relE.V1.Y, startEdge, circles))
+                if (CanBeSet(relE, relE.V1, relE.V2.X, relE.V1.Y, startEdge, circles, count))
                 {
                     relE.V1.X = relE.V2.X;
                     return true;
                 }
 
                 //if (true) //can be moved
-                if (CanBeSet(relE, relE.V2, relE.V1.X, relE.V2.Y, startEdge, circles))
+                if (CanBeSet(relE, relE.V2, relE.V1.X, relE.V2.Y, startEdge, circles, count))
                 {
                     relE.V2.X = relE.V1.X;
                     return true;
@@ -371,52 +339,12 @@ namespace PolygonDrawer.Model
             return false;
         }
 
-
-        public bool KeepParallel22(Edge movE, Edge relE, Vertex movV, int xTo, int yTo, Edge startEdge, int circles)
+        public bool SetParallel(Edge e1, Edge e2, Edge startEdge, int circles, int count)
         {
-            if (movV.X == xTo && movV.Y == yTo)
-                return true;
-            if (circles > 0 && movE == startEdge)
-            {
+            if (count > 3 * this.Vertices.Count)
                 return false;
-            }
-            if (movE == startEdge && circles == 0)
-                circles++;
+            count++;
 
-            var secEdgeOfMovV = movE != movV.E1 ? movV.E1 : movV.E2;
-
-            //if (!CanBeSet(secEdgeOfMovV, movV, xTo, yTo, startEdge, 0))
-            //    return false;
-
-            var anV = movE.V1 != movV ? movE.V1 : movE.V2;
-
-            var x = anV.X;
-            var y = anV.Y;
-
-            x = x + xTo - movV.X;
-            y = y + yTo - movV.Y;
-
-            if (x > 4 && x < width - 4 && y > 4 && y < height - 4)
-            {
-                //if (true) // can be moved
-                //if(CanBeSet(movE, movV, xTo, yTo, startEdge, circles) 
-                //   && CanBeSet(movE, anV, x, y, startEdge, circles))
-                if(CanBeSet(movE, anV, x, y, startEdge, circles))
-                {
-                    movV.X = xTo;
-                    movV.Y = yTo;
-                    anV.X = x;
-                    anV.Y = y;
-                    return true;
-                }
-            }
-
-
-            return false;
-        }
-
-        public bool SetParallel(Edge e1, Edge e2, Edge startEdge, int circles)
-        {
             if (circles > 0 && e2 == startEdge)
             {
                 return false;
@@ -438,7 +366,7 @@ namespace PolygonDrawer.Model
                 if (x > 4 && x < width - 4)
                 {
                     //if (true) //can be moved
-                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circles))
+                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circles, count))
                     {
                         v1.X = x;
                         return true;
@@ -451,7 +379,7 @@ namespace PolygonDrawer.Model
                 if (y > 4 && y < height - 4)
                 {
                     //if(true) //can be moved
-                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circles))
+                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circles, count))
                     {
                         v1.Y = y;
                         return true;
@@ -469,7 +397,7 @@ namespace PolygonDrawer.Model
                 if (x > 4 && x < width - 4)
                 {
                     //if (true) //can be moved
-                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circles))
+                    if(CanBeSet(e2, v1, x, v1.Y, startEdge, circles, count))
                     {
                         v1.X = x;
                         return true;
@@ -482,7 +410,7 @@ namespace PolygonDrawer.Model
                 if (y > 4 && y < height - 4)
                 {
                     //if (true) //can be moved
-                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circles))
+                    if(CanBeSet(e2, v1, v1.X, y, startEdge, circles, count))
                     {
                         v1.Y = y;
                         return true;
@@ -492,14 +420,14 @@ namespace PolygonDrawer.Model
             else // x != x
             {
                 //if (true) //can be moved
-                if(CanBeSet(e2, e2.V1, e2.V2.X, e2.V1.Y, startEdge, circles))
+                if(CanBeSet(e2, e2.V1, e2.V2.X, e2.V1.Y, startEdge, circles, count))
                 {
                     e2.V1.X = e2.V2.X;
                     return true;
                 }
 
                 //if (true) //can be moved
-                if(CanBeSet(e2, e2.V2, e2.V1.X, e2.V2.Y, startEdge, circles))
+                if(CanBeSet(e2, e2.V2, e2.V1.X, e2.V2.Y, startEdge, circles, count))
                 {
                     e2.V2.X = e2.V1.X;
                     return true;
@@ -510,7 +438,7 @@ namespace PolygonDrawer.Model
         }
 
 
-        public bool CanBeSet(Edge e, Vertex v2, int x, int y, Edge startEdge, int circles)
+        public bool CanBeSet(Edge e, Vertex v2, int x, int y, Edge startEdge, int circles, int count)
         {
             var secEdge = v2.E1 != e ? v2.E1 : v2.E2;
             if (circles > 0 && secEdge == startEdge)
@@ -522,81 +450,16 @@ namespace PolygonDrawer.Model
 
             if (secEdge.RelType == TypeOfRelation.Equal)
             {
-                return KeepEqualLength(secEdge, secEdge.RelatedEdge, v2, x, y, startEdge, circles);
+                return KeepEqualLength(secEdge, secEdge.RelatedEdge, v2, x, y, startEdge, circles, count);
             }
             else if(secEdge.RelType == TypeOfRelation.Parallel)
             {
-                return KeepParallel(secEdge, secEdge.RelatedEdge, v2, x, y, startEdge, circles);
+                return KeepParallel(secEdge, secEdge.RelatedEdge, v2, x, y, startEdge, circles, count);
             }
 
             return secEdge.RelType == TypeOfRelation.None;
-
-            
-
-            //if (anE.RelType == TypeOfRelation.None)
-            //{
-            //    return true;
-            //}
-            //else if (anE.RelType == TypeOfRelation.Equal)
-            //{
-            //    var anV = anE.V1 != v2 ? anE.V1 : anE.V2;
-
-            //    if (anE.RelatedEdge.Length + 10 >= Length(anV.X, anV.Y, x, y))
-            //        return true;
-            //    else
-            //        return false;
-            //}
-            //return true;
         }
 
-        public bool AdjustLenRel(Edge EMoving, int Xf, int Yf, int Xt, int Yt)//, Edge EToMove)
-        {
-            var eRel = EMoving.RelatedEdge;
-            var v1moving = Xf == EMoving.V1.X && Yf == EMoving.V1.Y ? EMoving.V1 : EMoving.V2;
-            var vStaying = v1moving == EMoving.V1 ? EMoving.V2 : EMoving.V1;
-            bool lenGood = false;
-
-            var wantedLen = (int)Math.Sqrt((vStaying.X - Xt) *(vStaying.X - Xt) + (vStaying.Y - Yt) *(vStaying.Y - Yt));
-
-            var e = eRel;
-            var v1 = eRel.V1;
-            var v2 = eRel.V2;
-
-            do
-            {
-                for(int i = 1; i < 100; i ++)
-                {
-                    for(int j = v1.X - i; j <= v1.X + i; j++)
-                    {
-                        for(int k = v1.Y - i; k <= v1.Y + i; k++)
-                        {
-                            if (k > width - 4 || k < 4 || j > height - 4 || j < 4)
-                                continue;
-                            if(Length(j, k, v2.X, v2.Y) == wantedLen)
-                            {
-                                //sprawdz druga krawedz
-                                lenGood = true;
-                                v1.X = j;
-                                v1.Y = k;
-                                break;
-                            }
-                        }
-                        if (lenGood)
-                            break;
-                    }
-                    if (lenGood)
-                        break;
-                }
-                if (lenGood)
-                    break;
-
-            }
-            while (true);
-
-            return lenGood;
-
-            return false;
-        }
 
         private int Length(int x1, int y1, int x2, int y2)
         {
@@ -648,25 +511,6 @@ namespace PolygonDrawer.Model
 
             return smaller > bigger * prec;
         }
-
-        private bool CheckAndSet(double wantedTan, Vertex vToCheck, int x, int y, Vertex anotherV)
-        {
-            if (AlmostEqual(wantedTan, Tan(x, y, anotherV.X, anotherV.Y), 0.9))
-            {
-                if (x > 4 && y > 4 && x < width - 4 && y < height - 4)
-                {
-                    if (true) // can be set
-                    {
-                        vToCheck.X = x;
-                        vToCheck.Y = y;
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
 
     }
 }
