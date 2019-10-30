@@ -1,0 +1,13 @@
+﻿<Application x:Class="PolygonDrawer.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:PolygonDrawer"
+             StartupUri="MainWindow.xaml"
+             xmlns:vm="clr-namespace:PolygonDrawer.ViewModel"
+             >
+    <Application.Resources>
+        <ResourceDictionary>
+            <vm:MainViewModel x:Key="Main"></vm:MainViewModel>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
