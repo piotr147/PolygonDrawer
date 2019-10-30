@@ -8,7 +8,8 @@ namespace PolygonDrawer.Model
 {
     public enum TypeOfRelation
     {
-        Parallel = 0,
-        Equal = 1
+        None = 0,
+        Equal = 1,
+        Parallel = 2
     }
 }

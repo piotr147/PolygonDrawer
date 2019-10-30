@@ -15,6 +15,13 @@ namespace PolygonDrawer.Model
         private int _y;
         private Edge _e1;
         private Edge _e2;
+        private bool _isFixed;
+
+        public bool IsFixed
+        {
+            get { return _isFixed; }
+            set { _isFixed = value; RaisePropertyChanged(nameof(IsFixed)); }
+        }
 
         public int X
         {
